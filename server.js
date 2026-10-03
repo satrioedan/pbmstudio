@@ -55,6 +55,78 @@ function humanizeError(raw) {
   return s
 }
 
+function boostLyricsLocally(lyrics, title, style) {
+  const raw = String(lyrics || "").trim()
+  const hook = (title || raw.split(/\n/).map((l) => l.trim()).find(Boolean) || "Ini laguku").replace(/^\[.*?\]\s*/, "")
+  const flavor = style ? style.split(",")[0].trim() : "melodi yang hangat"
+  if (!raw) {
+    return [
+      "[Verse 1]",
+      `${hook} datang pelan, tapi tidak mau pergi`,
+      `Di ${flavor}, aku simpan semua yang tersisa`,
+      "Satu kalimat kecil jadi alasan untuk bertahan",
+      "Dan malam ini suaranya lebih jujur dari kemarin",
+      "",
+      "[Pre-Chorus]",
+      "Pelan dulu, lalu biarkan nadanya naik",
+      "Aku tahu bagian ini yang akan kau ingat",
+      "",
+      "[Chorus]",
+      hook,
+      `${hook}, ulang sampai jadi rumah`,
+      "Simpan di kepala, jangan dilepas",
+      `${hook}, ini hook yang pulang sendiri`,
+      "",
+      "[Verse 2]",
+      "Detail yang dulu sepele sekarang jadi bukti",
+      "Aku sebut namamu tanpa perlu berteriak",
+      "Kalau dunia ramai, chorus ini yang menuntun",
+      "Dan aku tetap di baris yang paling mudah diingat",
+      "",
+      "[Bridge]",
+      "Bukan soal sempurna, soal terasa dekat",
+      "Satu nada turun, lalu semua kembali naik",
+      "",
+      "[Chorus]",
+      hook,
+      `${hook}, ulang sampai jadi rumah`,
+      "",
+      "[Outro]",
+      hook,
+    ].join("\n").slice(0, 5000)
+  }
+  if (/\[chorus\]/i.test(raw) && /\[verse/i.test(raw)) {
+    return raw.includes(hook) ? raw : `${raw}\n\n[Chorus]\n${hook}\n${hook}`.slice(0, 5000)
+  }
+  const lines = raw.split(/\n+/).map((l) => l.trim()).filter((l) => l && !/^\[/.test(l))
+  const take = (start, count) => lines.slice(start, start + count).join("\n") || hook
+  return [
+    "[Verse 1]",
+    take(0, 4),
+    "",
+    "[Pre-Chorus]",
+    lines[4] || "Dan aku tahu ini baru mulai",
+    "",
+    "[Chorus]",
+    hook,
+    lines[0] || hook,
+    `${hook}, jangan lupa baris ini`,
+    "",
+    "[Verse 2]",
+    take(5, 4),
+    "",
+    "[Bridge]",
+    lines.at(-1) || "Kalau sunyi, chorus ini yang menjawab",
+    "",
+    "[Chorus]",
+    hook,
+    lines[0] || hook,
+    "",
+    "[Outro]",
+    hook,
+  ].join("\n").slice(0, 5000)
+}
+
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -338,7 +410,7 @@ async function handleApi(req, res, url) {
   }
 
   // Routes dengan :id
-  const idMatch = pathname.match(/^\/api\/songs\/([^/]+)(\/like|\/cover|\/stems|\/wav|\/download|\/stream|\/retry)?$/)
+  const idMatch = pathname.match(/^\/api\/songs\/([^/]+)(\/like|\/cover|\/stems|\/wav|\/download|\/stream|\/retry|\/extend|\/video)?$/)
   if (idMatch) {
     const id = idMatch[1]
     const sub = idMatch[2] || ""
@@ -568,6 +640,22 @@ async function handleApi(req, res, url) {
       if (song.stemStatus === "processing") return sendJson(res, 409, { error: "Pemisahan stem sedang berjalan" })
       const body = await readBody(req)
       const type = body.type === "split_stem" ? "split_stem" : "separate_vocal"
+      if (song.provider === "crun") {
+        if (!crunProvider.hasKey()) return sendJson(res, 400, { error: "Belum ada API key crun.ai. Tambahkan di Setelan API Key bagian crun.ai." })
+        const trackId = body.trackId || (Array.isArray(song.tracks) && song.tracks[0] && song.tracks[0].id) || null
+        let job
+        try {
+          job = await crunProvider.stems({ taskId: song.providerJobId, sunoId: trackId, type })
+        } catch (e) {
+          return sendJson(res, 502, { error: "crun.ai gagal: " + e.message })
+        }
+        const updated = store.updateSong(id, {
+          stemProvider: "crun", stemType: type,
+          stemJobId: job.jobId, stemKeyId: job.keyId || song.providerKeyId || null,
+          stemStatus: "processing", stems: [], stemError: null,
+        })
+        return sendJson(res, 201, { song: updated, credits: store.getAllCredits() })
+      }
       const isSuno = song.provider === "uploadcover"
       const which = isSuno ? "suno" : "apiframe"
       if (store.getCredits(which) < STEM_COST) {
@@ -616,6 +704,78 @@ async function handleApi(req, res, url) {
       return sendJson(res, 201, { song: updated, credits: store.getAllCredits() })
     }
 
+    // POST /api/songs/:id/extend -> perpanjang lagu crun.ai jadi lagu baru
+    if (method === "POST" && sub === "/extend") {
+      if (song.provider !== "crun") return sendJson(res, 400, { error: "Perpanjang lewat crun.ai hanya untuk lagu crun.ai" })
+      if (song.status !== "success") return sendJson(res, 400, { error: "Lagu harus selesai dulu sebelum diperpanjang" })
+      if (!crunProvider.hasKey()) return sendJson(res, 400, { error: "Belum ada API key crun.ai. Tambahkan di Setelan API Key bagian crun.ai." })
+      const body = await readBody(req)
+      const trackId = body.trackId || (Array.isArray(song.tracks) && song.tracks[0] && song.tracks[0].id) || null
+      const style = (body.style || song.style || "").toString().slice(0, LIMITS.style)
+      const lyrics = (body.lyrics || song.lyrics || "").toString().slice(0, LIMITS.lyrics)
+      const title = (body.title || `${song.title} (Perpanjang)`).toString().slice(0, LIMITS.title)
+      const continueAt = Number(body.continueAt)
+      let job
+      try {
+        job = await crunProvider.extend({
+          sunoId: trackId,
+          model: song.model,
+          continueAt: Number.isFinite(continueAt) ? continueAt : 30,
+          title,
+          style,
+          lyrics,
+          vocalGender: song.vocalGender,
+          instrumental: song.type === "instrumental",
+        })
+      } catch (e) {
+        return sendJson(res, 502, { error: "crun.ai gagal: " + e.message })
+      }
+      const now = Date.now()
+      const extended = store.addSong({
+        id: randomUUID(),
+        title, lyrics, style,
+        type: song.type, vocalGender: song.vocalGender,
+        model: song.model, modelLabel: "crun.ai Extend", credits: 0,
+        status: job.status || "processing",
+        audioUrl: null, imageUrl: song.imageUrl || null, tracks: [], error: null, liked: false,
+        provider: "crun",
+        providerJobId: job.jobId,
+        providerKeyId: job.keyId || song.providerKeyId || null,
+        isExtend: true, extendOf: song.id,
+        createdAt: now, updatedAt: now,
+      })
+      return sendJson(res, 201, { song: extended, credits: store.getAllCredits() })
+    }
+
+    // POST /api/songs/:id/video -> video lirik crun.ai, menempel di lagu yang sama
+    if (method === "POST" && sub === "/video") {
+      if (song.provider !== "crun") return sendJson(res, 400, { error: "Video lewat crun.ai hanya untuk lagu crun.ai" })
+      if (song.status !== "success") return sendJson(res, 400, { error: "Lagu harus selesai dulu sebelum dibuat video" })
+      if (song.videoStatus === "processing") return sendJson(res, 409, { error: "Video sedang dibuat" })
+      if (!crunProvider.hasKey()) return sendJson(res, 400, { error: "Belum ada API key crun.ai. Tambahkan di Setelan API Key bagian crun.ai." })
+      const body = await readBody(req)
+      const trackId = body.trackId || (Array.isArray(song.tracks) && song.tracks[0] && song.tracks[0].id) || null
+      let job
+      try {
+        job = await crunProvider.video({
+          taskId: song.providerJobId,
+          sunoId: trackId,
+          author: body.author,
+          brand: body.brand,
+        })
+      } catch (e) {
+        return sendJson(res, 502, { error: "crun.ai gagal: " + e.message })
+      }
+      const updated = store.updateSong(id, {
+        videoJobId: job.jobId,
+        videoKeyId: job.keyId || song.providerKeyId || null,
+        videoStatus: "processing",
+        videoUrl: null,
+        videoError: null,
+      })
+      return sendJson(res, 201, { song: updated, credits: store.getAllCredits() })
+    }
+
     // GET /api/songs/:id/download?src=<url>
     // GET /api/songs/:id/stream?src=<url>
     //   download = attachment, stream = inline untuk pemutar audio.
@@ -625,13 +785,14 @@ async function handleApi(req, res, url) {
       if (song.audioUrl) allowed.add(song.audioUrl)
       if (Array.isArray(song.tracks)) for (const t of song.tracks) if (t && t.audioUrl) allowed.add(t.audioUrl)
       if (song.wavUrl) allowed.add(song.wavUrl)
+      if (song.videoUrl) allowed.add(song.videoUrl)
       if (Array.isArray(song.stems)) for (const s of song.stems) if (s && s.url) allowed.add(s.url)
       if (!src || !allowed.has(src)) return sendJson(res, 400, { error: "Sumber audio tidak valid untuk lagu ini" })
       const safeTitle = (song.title || "track").replace(/[^\w.-]+/g, "_").slice(0, 60) || "track"
 
-      const extM = src.toLowerCase().match(/\.(mp3|wav|m4a|flac|ogg|aac)(?:[?#]|$)/)
+      const extM = src.toLowerCase().match(/\.(mp3|wav|m4a|flac|ogg|aac|mp4)(?:[?#]|$)/)
       const ext = (extM && extM[1]) || "mp3"
-      const fallbackType = ext === "wav" ? "audio/wav" : ext === "flac" ? "audio/flac" : ext === "ogg" ? "audio/ogg" : ext === "m4a" || ext === "aac" ? "audio/mp4" : "audio/mpeg"
+      const fallbackType = ext === "mp4" ? "video/mp4" : ext === "wav" ? "audio/wav" : ext === "flac" ? "audio/flac" : ext === "ogg" ? "audio/ogg" : ext === "m4a" || ext === "aac" ? "audio/mp4" : "audio/mpeg"
       const filename = `${safeTitle}.${ext}`
 
       // File lokal (mis. hasil Mastering di /uploads/mastered/...) disajikan langsung dari disk,
@@ -738,9 +899,20 @@ async function handleApi(req, res, url) {
         try {
           const st = cur.stemProvider === "suno"
             ? await uploadCover.getStemStatus(cur.stemJobId, cur.stemKeyId)
-            : await provider.getStemStatus(cur.stemJobId, cur.stemKeyId)
+            : cur.stemProvider === "crun"
+              ? await crunProvider.getStemStatus(cur.stemJobId, cur.stemKeyId)
+              : await provider.getStemStatus(cur.stemJobId, cur.stemKeyId)
           if (st.status !== "processing") {
             store.updateSong(id, { stemStatus: st.status, stems: st.stems ?? cur.stems ?? [], stemError: st.error ?? null })
+          }
+        } catch { /* biarkan */ }
+      }
+      cur = store.getSong(id)
+      if (cur && cur.videoStatus === "processing" && cur.videoJobId && cur.provider === "crun") {
+        try {
+          const st = await crunProvider.getVideoStatus(cur.videoJobId, cur.videoKeyId)
+          if (st.status !== "processing") {
+            store.updateSong(id, { videoStatus: st.status, videoUrl: st.videoUrl ?? cur.videoUrl ?? null, videoError: st.error ?? null })
           }
         } catch { /* biarkan */ }
       }
@@ -1292,6 +1464,37 @@ async function handleApi(req, res, url) {
     const block = store.toggleBlockVisibility(blockToggleMatch[1])
     if (!block) return sendJson(res, 404, { error: "Blok tidak ditemukan" })
     return sendJson(res, 200, { block })
+  }
+
+  // POST /api/lyrics/boost -> perkuat lirik. Gemini bila ada key, kalau tidak pakai penguat lokal.
+  if (method === "POST" && pathname === "/api/lyrics/boost") {
+    const body = await readBody(req)
+    const lyrics = (body.lyrics || "").toString().slice(0, 5000)
+    const title = (body.title || "").toString().slice(0, 80)
+    const style = (body.style || "").toString().slice(0, 1000)
+    const model = (body.model || "").toString().slice(0, 60)
+    if (!lyrics.trim() && !title.trim() && !style.trim()) {
+      return sendJson(res, 400, { error: "Isi lirik, judul, atau gaya dulu" })
+    }
+    if (store.getGeminiRawKeys().length) {
+      const prompt = [
+        "Kamu penulis lirik lagu. Perkuat lirik berikut agar hook-nya lebih mudah diingat, rimanya lebih rapat, emosinya lebih jelas, dan strukturnya siap dipakai generator musik.",
+        "Pertahankan bahasa, tema, dan makna. Jangan mengubah judul menjadi cerita lain.",
+        "Format wajib: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Chorus], [Outro].",
+        "Ulangi baris hook di chorus. Setiap bagian 4-8 baris. Jangan terlalu panjang.",
+        "Output HANYA lirik. Tanpa penjelasan, catatan, atau markdown.",
+        title ? `Judul: ${title}` : "",
+        style ? `Gaya: ${style}` : "",
+        "",
+        lyrics.trim() ? `LIRIK ASLI:\n${lyrics}` : "Lirik asli kosong. Tulis lirik baru dari judul dan gaya.",
+      ].filter(Boolean).join("\n")
+      try {
+        const out = await gemini.generateText(prompt, model)
+        const text = String(out.text || "").replace(/^```[\w]*\n?|```$/g, "").trim()
+        if (text) return sendJson(res, 200, { lyrics: text.slice(0, 5000), source: "gemini" })
+      } catch { /* lanjut ke penguat lokal */ }
+    }
+    return sendJson(res, 200, { lyrics: boostLyricsLocally(lyrics, title, style), source: "local" })
   }
 
   // POST /api/lyrics/generate -> hasilkan lirik via Gemini (rotasi key ditangani gemini.js)

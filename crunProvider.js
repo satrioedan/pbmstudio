@@ -160,6 +160,62 @@ function buildCoverBody({ audioUrl, title, lyrics, prompt, style, instrumental, 
   return { model: "suno/music-cover", input }
 }
 
+function sourceIds({ taskId, sunoId }) {
+  if (!taskId || !sunoId || /^\d+$/.test(String(sunoId))) {
+    throw new Error("Lagu ini belum punya Suno ID. Stem dan video hanya untuk lagu yang selesai dari crun.ai.")
+  }
+  return { taskId, sunoId }
+}
+
+const STEM_LABELS = {
+  vocal_url: "Vokal",
+  instrumental_url: "Instrumen",
+  backing_vocals_url: "Backing vokal",
+  drums_url: "Drum",
+  bass_url: "Bass",
+  guitar_url: "Gitar",
+  keyboard_url: "Keyboard",
+  percussion_url: "Perkusi",
+  strings_url: "Strings",
+  synth_url: "Synth",
+  fx_url: "FX",
+}
+
+function parseStemTask(task) {
+  const status = mapStatus(task?.status)
+  if (status !== "success") {
+    return status === "failed" ? { status, error: task?.result?.message || "Pemisahan stem gagal" } : { status }
+  }
+  const info = task?.result?.media_info || {}
+  const stems = Object.entries(STEM_LABELS)
+    .filter(([key]) => typeof info[key] === "string" && info[key])
+    .map(([key, name]) => ({ name, url: info[key] }))
+  if (!stems.length) return { status: "processing" }
+  return { status: "success", stems }
+}
+
+function parseVideoTask(task) {
+  const status = mapStatus(task?.status)
+  if (status !== "success") {
+    return status === "failed" ? { status, error: task?.result?.message || "Video gagal" } : { status }
+  }
+  const urls = []
+  const info = task?.result?.media_info || {}
+  if (info.video_url) urls.push(info.video_url)
+  if (Array.isArray(task?.result?.media_urls)) urls.push(...task.result.media_urls.filter((u) => typeof u === "string"))
+  const videoUrl = urls.find((u) => /\.mp4|video/i.test(u)) || urls[0] || null
+  if (!videoUrl) return { status: "processing" }
+  return { status: "success", videoUrl }
+}
+
+async function fetchTask(jobId, keyId) {
+  const key = resolveKey(keyId)
+  if (!key) throw new Error("API key crun.ai untuk job ini tidak ditemukan")
+  const r = await call(`/api/v1/client/job/TaskInfo?task_id=${encodeURIComponent(jobId)}`, key)
+  if (!r.ok) throw new Error(errorMessage(r.data, r.code))
+  return r.data?.data
+}
+
 async function submitTask(body) {
   const pool = poolForGenerate()
   if (!pool.length) throw new Error("Belum ada API key crun.ai. Tambahkan di Setelan API Key bagian crun.ai.")
@@ -261,6 +317,90 @@ export const crunProvider = {
     }
     if (status === "failed") return { status, error: task?.result?.message || "crun.ai gagal generate" }
     return { status }
+  },
+
+  async stems({ taskId, sunoId, trackId, type }) {
+    const ids = sourceIds({ taskId, sunoId: sunoId || trackId })
+    const mode = type === "split_stem" ? "instrumental" : "vocal"
+    if (MOCK) {
+      const jobId = "crun_stem_mock_" + Math.random().toString(36).slice(2, 12)
+      mockJobs.set(jobId, {
+        finishAt: Date.now() + MOCK_DELAY,
+        stems: mode === "instrumental"
+          ? [{ name: "Drum", url: SAMPLE_AUDIO[0] }, { name: "Bass", url: SAMPLE_AUDIO[1] }, { name: "Vokal", url: SAMPLE_AUDIO[0] }]
+          : [{ name: "Vokal", url: SAMPLE_AUDIO[0] }, { name: "Instrumen", url: SAMPLE_AUDIO[1] }],
+      })
+      return { jobId, status: "processing", keyId: "mock" }
+    }
+    return submitTask({
+      model: "suno/vocal-separatio",
+      input: { task_id: ids.taskId, suno_id: ids.sunoId, mode },
+    })
+  },
+
+  async getStemStatus(jobId, keyId) {
+    if (MOCK) {
+      const job = mockJobs.get(jobId)
+      if (!job) return { status: "failed", error: "Mock job tidak ditemukan" }
+      if (Date.now() >= job.finishAt) return { status: "success", stems: job.stems || [] }
+      return { status: "processing" }
+    }
+    const task = await fetchTask(jobId, keyId)
+    return parseStemTask(task)
+  },
+
+  async extend(input) {
+    const sunoId = input?.sunoId || input?.trackId
+    if (!sunoId || /^\d+$/.test(String(sunoId))) {
+      throw new Error("Lagu ini belum punya Suno ID. Perpanjang hanya untuk lagu yang selesai dari crun.ai.")
+    }
+    const version = mapVersion(input.model)
+    const isV4 = version === "v4"
+    const title = String(input.title || "Extended").slice(0, 80)
+    const tags = String(input.style || "pop").slice(0, isV4 ? 200 : 1000)
+    const prompt = String(input.lyrics || input.style || "continue the song with a new section and outro").slice(0, isV4 ? 3000 : 5000)
+    const continueAt = Number(input.continueAt)
+    const bodyInput = {
+      suno_id: sunoId,
+      mode: "custom",
+      model: version,
+      continue_at: Number.isFinite(continueAt) && continueAt >= 0 ? continueAt : 30,
+      title,
+      tags,
+      prompt,
+    }
+    const gender = vocalCode(input.vocalGender)
+    if (gender) bodyInput.vocal_gender = gender
+    if (input.instrumental) bodyInput.instrumental = true
+    if (MOCK) {
+      const jobId = "crun_ext_mock_" + Math.random().toString(36).slice(2, 12)
+      mockJobs.set(jobId, { finishAt: Date.now() + MOCK_DELAY, audioUrl: SAMPLE_AUDIO[1] })
+      return { jobId, status: "processing", keyId: "mock" }
+    }
+    return submitTask({ model: "suno/music-extend", input: bodyInput })
+  },
+
+  async video({ taskId, sunoId, author, brand }) {
+    const ids = sourceIds({ taskId, sunoId })
+    const input = { task_id: ids.taskId, suno_id: ids.sunoId }
+    if (author) input.author = String(author).slice(0, 80)
+    if (brand) input.brand = String(brand).slice(0, 80)
+    if (MOCK) {
+      const jobId = "crun_vid_mock_" + Math.random().toString(36).slice(2, 12)
+      mockJobs.set(jobId, { finishAt: Date.now() + MOCK_DELAY, videoUrl: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" })
+      return { jobId, status: "processing", keyId: "mock" }
+    }
+    return submitTask({ model: "suno/music-video", input })
+  },
+
+  async getVideoStatus(jobId, keyId) {
+    if (MOCK) {
+      const job = mockJobs.get(jobId)
+      if (!job) return { status: "failed", error: "Mock job tidak ditemukan" }
+      if (Date.now() >= job.finishAt) return { status: "success", videoUrl: job.videoUrl }
+      return { status: "processing" }
+    }
+    return parseVideoTask(await fetchTask(jobId, keyId))
   },
 
   async checkCredits(key) {

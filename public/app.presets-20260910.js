@@ -812,7 +812,7 @@ async function loadSongs(liked) {
 
 function songCardHtml(s) {
   const cover = s.imageUrl || "/icon-192.png"
-  const kind = s.isMastered ? "Mastering" : s.isUpload ? "Upload" : s.isCover ? "Aransemen" : s.provider === "kie" ? "KIE AI" : s.provider === "musicapi" ? "MusicAPI" : s.provider === "crun" ? "crun.ai" : (s.provider === "uploadcover" ? "sunoapi" : s.provider === "mastering" ? "Mastering" : "APIframe")
+  const kind = s.isMastered ? "Mastering" : s.isUpload ? "Upload" : s.isExtend ? "Perpanjangan" : s.isCover ? "Aransemen" : s.provider === "kie" ? "KIE AI" : s.provider === "musicapi" ? "MusicAPI" : s.provider === "crun" ? "crun.ai" : (s.provider === "uploadcover" ? "sunoapi" : s.provider === "mastering" ? "Mastering" : "APIframe")
   const canPlay = s.status === "success" && Boolean(firstAudioSrc(s))
   const isFailed = s.status === "failed"
   const isBusy = s.status === "processing" || s.status === "queued"
@@ -1070,7 +1070,8 @@ function startPoll(id, key) {
       const done = song.status !== "processing" && song.status !== "queued"
       const stemDone = song.stemStatus !== "processing"
       const wavDone = song.wavStatus !== "processing"
-      if (done && stemDone && wavDone) {
+      const videoDone = song.videoStatus !== "processing"
+      if (done && stemDone && wavDone && videoDone) {
         stopPoll(k)
         await refreshCredits()
         if (song.status === "success") toast(`Lagu “${song.title || "Tanpa judul"}” berhasil dibuat`, "success")
@@ -1278,7 +1279,7 @@ async function openDetail(id) {
     state.selected = song
     renderDetail(song)
     $("#detail").classList.remove("hidden")
-    if (song.status === "processing" || song.status === "queued" || song.stemStatus === "processing" || song.wavStatus === "processing") startPoll(id)
+    if (song.status === "processing" || song.status === "queued" || song.stemStatus === "processing" || song.wavStatus === "processing" || song.videoStatus === "processing") startPoll(id)
   } catch (e) { toast(e.message, "error") }
 }
 function closeDetail() {
@@ -1302,7 +1303,7 @@ function setActiveTrack(src, imageUrl) {
 }
 function renderDetail(song) {
   state.selected = song
-  const kind = song.isUpload ? "\uD83C\uDF99\uFE0F Upload & Cover" : song.isCover ? "\uD83C\uDFB8 Aransemen Ulang" : (song.provider === "uploadcover" ? "sunoapi.org" : "APIframe")
+  const kind = song.isUpload ? "\uD83C\uDF99\uFE0F Upload & Cover" : song.isExtend ? "Perpanjangan" : song.isCover ? "\uD83C\uDFB8 Aransemen Ulang" : song.provider === "crun" ? "crun.ai" : (song.provider === "uploadcover" ? "sunoapi.org" : "APIframe")
   $("#d-kind").textContent = kind
   $("#d-title").textContent = song.title
   $("#d-style").textContent = song.style || song.modelLabel || ""
@@ -1331,6 +1332,7 @@ function renderDetail(song) {
   $("#btn-like").textContent = song.liked ? "\uD83D\uDC94 Batal Favorit" : "\u2764\uFE0F Favorit"
   $("#btn-cover").disabled = song.status !== "success" || song.provider === "uploadcover"
   $("#btn-stem").disabled = song.status !== "success"
+  ensureCrunActions(song)
 
   renderStemWav(song)
 }
@@ -1344,6 +1346,14 @@ function renderStemWav(song) {
     else if (song.stemStatus === "failed") parts.push(`<p class="sw-row err">Stem gagal: ${escapeHtml(song.stemError || "")}</p>`)
     else if (song.stemStatus === "success" && Array.isArray(song.stems)) {
       parts.push('<div class="sw-stems">' + song.stems.map((s) => `<div class="sw-stem"><span>${escapeHtml(s.name)}</span><audio controls preload="none" src="${s.url}"></audio><a class="sw-dl" href="${s.url}" download>\u2193</a></div>`).join("") + "</div>")
+    }
+  }
+  if (song.videoStatus) {
+    if (song.videoStatus === "processing") parts.push('<p class="sw-row">Membuat video\u2026</p>')
+    else if (song.videoStatus === "failed") parts.push(`<p class="sw-row err">Video gagal: ${escapeHtml(song.videoError || "")}</p>`)
+    else if (song.videoStatus === "success" && song.videoUrl) {
+      const src = U("/api/songs/" + song.id + "/stream?src=" + encodeURIComponent(song.videoUrl))
+      parts.push(`<div class="sw-row"><video controls preload="metadata" src="${src}" style="width:100%;max-height:240px"></video><a class="sw-dl" href="${src}" download>Unduh video</a></div>`)
     }
   }
   if (song.wavStatus) {
@@ -1384,8 +1394,13 @@ function openStem() {
   $("#stem-src-title").textContent = state.selected.title
   $("#stem-status").textContent = ""
   const isSuno = state.selected.provider === "uploadcover"
-  $("#wav-go").style.display = isSuno ? "" : "none"
-  $("#stem-note").textContent = isSuno
+  const isCrun = state.selected.provider === "crun"
+  $("#wav-go").style.display = isSuno || isCrun ? "" : "none"
+  $("#wav-go").textContent = isCrun ? "Konversi ke WAV" : "Konversi ke WAV (6 kredit)"
+  $("#stem-go").textContent = isCrun ? "Pisah stem" : "Pisah stem (11 kredit)"
+  $("#stem-note").textContent = isCrun
+    ? "Stem, perpanjang, dan video lewat crun.ai. WAV dikonversi di browser dari audio yang sudah jadi."
+    : isSuno
     ? "Stem & WAV via sunoapi.org. Memakai key yang sama dengan lagu sumber."
     : "Stem via APIframe. WAV API tidak tersedia untuk APIframe \u2014 gunakan Unduh MP3."
   $("#stem-modal").classList.remove("hidden")
@@ -1401,8 +1416,81 @@ async function submitStem() {
     closeStem(); await refreshCredits(); renderDetail(song); startPoll(song.id)
   } catch (e) { $("#stem-status").textContent = e.message; toast(e.message, "error") }
 }
+async function convertCrunToWav(song) {
+  const src = state.activeSrc || song.audioUrl
+  if (!src) throw new Error("Audio belum siap")
+  const res = await fetch(U("/api/songs/" + song.id + "/stream?src=" + encodeURIComponent(src)))
+  if (!res.ok) throw new Error("Audio tidak bisa diambil")
+  const ctx = new (window.AudioContext || window.webkitAudioContext)()
+  const buffer = await ctx.decodeAudioData(await res.arrayBuffer())
+  const blob = audioBufferToWav(buffer)
+  const a = document.createElement("a")
+  a.href = URL.createObjectURL(blob)
+  a.download = (song.title || "lagu").replace(/[^\w.-]+/g, "_").slice(0, 60) + ".wav"
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(a.href), 8000)
+  try { ctx.close() } catch { /* abaikan */ }
+}
+function ensureCrunActions(song) {
+  const bar = document.querySelector(".detail-actions")
+  if (bar && !$("#btn-extend")) {
+    const ext = document.createElement("button")
+    ext.id = "btn-extend"
+    ext.className = "btn-secondary"
+    ext.textContent = "Perpanjang"
+    const vid = document.createElement("button")
+    vid.id = "btn-video"
+    vid.className = "btn-secondary"
+    vid.textContent = "Video"
+    const stem = $("#btn-stem")
+    if (stem) stem.after(vid)
+    if (stem) stem.after(ext)
+    ext.addEventListener("click", doExtend)
+    vid.addEventListener("click", doVideo)
+  }
+  const show = song && song.provider === "crun"
+  const extBtn = $("#btn-extend")
+  const vidBtn = $("#btn-video")
+  if (extBtn) { extBtn.style.display = show ? "" : "none"; extBtn.disabled = !show || song.status !== "success" }
+  if (vidBtn) { vidBtn.style.display = show ? "" : "none"; vidBtn.disabled = !show || song.status !== "success" || song.videoStatus === "processing" }
+}
+async function doExtend() {
+  if (!state.selected) return
+  const sec = prompt("Perpanjang dari detik ke berapa?", "30")
+  if (sec === null) return
+  const style = prompt("Gaya lanjutan:", state.selected.style || "")
+  if (style === null) return
+  try {
+    const { song } = await api("/api/songs/" + state.selected.id + "/extend", { method: "POST", body: { continueAt: Number(sec) || 30, style: style.trim() } })
+    toast("Perpanjangan diproses\u2026", "success")
+    await refreshCredits()
+    setView("library")
+    startPoll(song.id)
+    openDetail(song.id)
+  } catch (e) { toast(e.message, "error") }
+}
+async function doVideo() {
+  if (!state.selected) return
+  const author = prompt("Nama di video (kosongkan jika tidak perlu):", "")
+  if (author === null) return
+  try {
+    const { song } = await api("/api/songs/" + state.selected.id + "/video", { method: "POST", body: { author: author.trim() } })
+    toast("Video diproses\u2026", "success")
+    renderDetail(song)
+    startPoll(song.id)
+  } catch (e) { toast(e.message, "error") }
+}
 async function submitWav() {
   if (!state.selected) return
+  if (state.selected.provider === "crun") {
+    $("#stem-status").textContent = "Mengonversi WAV di browser\u2026"
+    try {
+      await convertCrunToWav(state.selected)
+      toast("WAV siap diunduh", "success")
+      closeStem()
+    } catch (e) { $("#stem-status").textContent = e.message; toast(e.message, "error") }
+    return
+  }
   $("#stem-status").textContent = "Memproses\u2026"
   try {
     const { song } = await api("/api/songs/" + state.selected.id + "/wav", { method: "POST", body: {} })
@@ -1581,6 +1669,27 @@ function bindUI() {
   try { bindUIInner() } catch (e) { console.error("bindUI error (non-fatal):", e) }
 }
 
+async function boostLyrics() {
+  const input = $("#f-lyrics")
+  if (!input) return
+  const title = ($("#f-title") && $("#f-title").value) || ""
+  const style = ($("#f-style") && $("#f-style").value) || ""
+  if (!input.value.trim() && !title.trim() && !style.trim()) {
+    toast("Isi lirik, judul, atau gaya dulu", "error")
+    input.focus()
+    return
+  }
+  const btn = $("#boost-lyrics-btn")
+  if (btn) btn.disabled = true
+  toast("Memperkuat lirik\u2026", "info")
+  try {
+    const out = await api("/api/lyrics/boost", { method: "POST", body: { lyrics: input.value, title, style } })
+    input.value = String(out.lyrics || "").slice(0, 5000)
+    input.dispatchEvent(new Event("input", { bubbles: true }))
+    toast(out.source === "gemini" ? "Lirik diperkuat dengan Gemini" : "Lirik diperkuat", "success")
+  } catch (e) { toast(e.message, "error") }
+  finally { if (btn) btn.disabled = false }
+}
 function bindUIInner() {
   segment("f-type"); segment("f-gender")
   const fModel = $("#f-model")
@@ -1590,6 +1699,8 @@ function bindUIInner() {
     if (el) el.addEventListener("input", updateCreateCounts)
   })
   qa("[data-copy-target]").forEach((b) => b.addEventListener("click", () => copyField(b.dataset.copyTarget)))
+  const boostLyricsBtn = $("#boost-lyrics-btn")
+  if (boostLyricsBtn) boostLyricsBtn.addEventListener("click", boostLyrics)
   qa("[data-clear-target]").forEach((b) => b.addEventListener("click", () => clearField(b.dataset.clearTarget)))
   const clearBtn = $("#btn-create-clear")
   if (clearBtn) clearBtn.addEventListener("click", clearCreateForm)
