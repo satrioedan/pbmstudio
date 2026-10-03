@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync, renameSync } from 'node:fs';
+import { loadAppState, saveAppState } from '../lib/db.js';
 const text = max => z.string().trim().max(max);
 const id = z.string().regex(/^[A-Za-z0-9._-]{1,100}$/);
 const paid = { confirmed: z.literal(true).describe('True only after user approves this operation and its provider credit cost.'), request_id: z.string().uuid().describe('Unique UUID for this operation. Reuse on transport retries; do not automatically use a new UUID after an uncertain result.') };
@@ -13,8 +14,25 @@ export function sanitize(value) {
   return value;
 }
 export function createToolRegistry(api, journalPath, ownerId) {
-  const journal = existsSync(journalPath) ? JSON.parse(readFileSync(journalPath, 'utf8')) : {};
-  const save = () => { writeFileSync(journalPath + '.tmp', JSON.stringify(journal), { mode: 0o600 }); renameSync(journalPath + '.tmp', journalPath); };
+  const journal = journalPath && existsSync(journalPath) ? JSON.parse(readFileSync(journalPath, 'utf8')) : {};
+  let loaded = !journalPath || journalPath === 'neon';
+  const load = async () => {
+    if (loaded || journalPath !== 'neon') return;
+    const data = await loadAppState();
+    Object.assign(journal, data?.mcpJournal && typeof data.mcpJournal === 'object' ? data.mcpJournal : {});
+    loaded = true;
+  };
+  const save = async () => {
+    if (journalPath === 'neon') {
+      const data = await loadAppState() || {};
+      data.mcpJournal = journal;
+      await saveAppState(data);
+      return;
+    }
+    if (!journalPath) return;
+    writeFileSync(journalPath + '.tmp', JSON.stringify(journal), { mode: 0o600 });
+    renameSync(journalPath + '.tmp', journalPath);
+  };
   let queue = Promise.resolve();
   const serial = task => { const p = queue.then(task); queue = p.catch(() => {}); return p; };
   const defs = [];
@@ -57,6 +75,7 @@ export function createToolRegistry(api, journalPath, ownerId) {
     }, async (args, extra) => {
       if (!extra.authInfo?.scopes?.includes(d.write ? 'music:write' : 'music:read')) return { ...output({ error: 'Scope tidak mencukupi.' }), isError: true };
       const execute = async () => {
+        await load();
         if (!d.write) return output(sanitize(await d.run(args)));
         const { request_id, confirmed, ...body } = args;
         const hash = createHash('sha256').update(JSON.stringify([ownerId, d.name, body])).digest('hex');
@@ -67,10 +86,10 @@ export function createToolRegistry(api, journalPath, ownerId) {
           throw new Error('Hasil operasi sebelumnya belum pasti. Periksa koleksi/status di situs sebelum mencoba operasi baru.');
         }
         if (Object.keys(journal).length >= 10000) throw new Error('Jurnal operasi penuh. Administrator perlu mengarsipkan jurnal setelah memeriksa operasi tertunda.');
-        journal[request_id] = { hash, status: 'pending', at: Date.now() }; save();
+        journal[request_id] = { hash, status: 'pending', at: Date.now() }; await save();
         // Persist before side effects. A crash/timeout stays pending, never automatically retried.
         const result = output(sanitize(await d.run(body)));
-        journal[request_id] = { hash, status: 'done', at: Date.now(), result }; save(); return result;
+        journal[request_id] = { hash, status: 'done', at: Date.now(), result }; await save(); return result;
       };
       try { return await (d.write ? serial(execute) : execute()); }
       catch (e) { return { ...output({ error: e.publicMessage || (/^(Aransemen|Jenis pemisahan|WAV hanya|Track bukan|request_id|Hasil operasi|Jurnal operasi)/.test(e.message) ? e.message : 'Operasi gagal atau hasil belum pasti. Periksa situs sebelum mengulang tindakan berbayar.') }), isError: true }; }

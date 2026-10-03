@@ -32,7 +32,8 @@ export function createMcpHandler({ handleApi, withOwner, env = process.env }) {
     if (status >= 400) { const e = new Error('Backend rejected request'); e.publicMessage = publicBackendError(status, data); throw e; }
     return data;
   }
-  const registry = createToolRegistry(api, env.MCP_JOURNAL_PATH || fileURLToPath(new URL('../.mcp-journal.json', import.meta.url)), env.MCP_OWNER_ID);
+  const journalPath = env.MCP_JOURNAL_PATH || (env.VERCEL ? 'neon' : fileURLToPath(new URL('../.mcp-journal.json', import.meta.url)));
+  const registry = createToolRegistry(api, journalPath, env.MCP_OWNER_ID);
   const app = express(); app.disable('x-powered-by');
   // Rate limits use the direct peer, not untrusted forwarded headers.
   const { provider, login } = createAuth(config);
