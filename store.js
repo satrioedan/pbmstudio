@@ -16,6 +16,69 @@ const START_CREDITS = Number(process.env.START_CREDITS ?? 500)
 export const ENV_GEMINI_KEY = (process.env.GEMINI_API_KEY || "").trim()
 
 const CREDIT_KEYS = { apiframe: "creditsApiframe", suno: "creditsSuno" }
+function readyTracks(tracks) {
+  return (Array.isArray(tracks) ? tracks : []).filter((t) => t && t.audioUrl)
+}
+
+function versionTitle(title, index, total) {
+  const base = String(title || "Lagu").replace(/\s+\(\d+\)$/, "").trim() || "Lagu"
+  return (total > 1 ? `${base} (${index + 1})` : base).slice(0, 80)
+}
+
+function splitSongResult(song) {
+  const ready = readyTracks(song.tracks)
+  if (ready.length < 2) return []
+  const group = song.splitGroup || song.id
+  const now = Date.now()
+  const first = ready[0]
+  song.splitGroup = group
+  song.splitIndex = 1
+  song.title = versionTitle(song.title, 0, ready.length)
+  song.audioUrl = first.audioUrl
+  song.imageUrl = first.imageUrl || song.imageUrl || null
+  song.tracks = [first]
+  song.updatedAt = now
+  const created = []
+  for (let i = 1; i < ready.length; i++) {
+    const track = ready[i]
+    const exists = state.songs.find((s) => s.splitGroup === group && (
+      (track.id && Array.isArray(s.tracks) && s.tracks[0] && s.tracks[0].id === track.id) || s.audioUrl === track.audioUrl
+    ))
+    if (exists) continue
+    state.songs.push({
+      ...song,
+      id: randomUUID(),
+      title: versionTitle(song.title, i, ready.length),
+      audioUrl: track.audioUrl,
+      imageUrl: track.imageUrl || song.imageUrl || null,
+      tracks: [track],
+      splitGroup: group,
+      splitIndex: i + 1,
+      credits: 0,
+      liked: false,
+      stemProvider: null, stemType: null, stemJobId: null, stemKeyId: null,
+      stemStatus: null, stems: [], stemError: null,
+      wavJobId: null, wavKeyId: null, wavStatus: null, wavUrl: null, wavError: null,
+      videoJobId: null, videoKeyId: null, videoStatus: null, videoUrl: null, videoError: null,
+      createdAt: song.createdAt || now,
+      updatedAt: now,
+    })
+    created.push(state.songs.at(-1))
+  }
+  return created
+}
+
+function splitStoredSongs() {
+  let changed = false
+  for (const song of state.songs) {
+    if (song.status === "success" && readyTracks(song.tracks).length > 1) {
+      splitSongResult(song)
+      changed = true
+    }
+  }
+  return changed
+}
+
 function creditField(which) { return CREDIT_KEYS[which] || CREDIT_KEYS.apiframe }
 
 const ownerContext = new AsyncLocalStorage()
@@ -222,6 +285,7 @@ export const store = {
 
   // ------------------------------- LAGU ------------------------------------
   listSongs({ liked } = {}) {
+    if (splitStoredSongs()) persist(state)
     let songs = ownedList(state.songs).sort((a, b) => b.createdAt - a.createdAt)
     if (liked) songs = songs.filter((s) => s.liked)
     return songs
@@ -244,6 +308,14 @@ export const store = {
     Object.assign(song, patch, { updatedAt: Date.now() })
     persist(state)
     return song
+  },
+  applyResult(id, patch) {
+    const song = state.songs.find((s) => s.id === id)
+    if (!song) return { song: null, created: [] }
+    Object.assign(song, patch, { updatedAt: Date.now() })
+    const created = song.status === "success" ? splitSongResult(song) : []
+    persist(state)
+    return { song, created }
   },
   deleteSong(id) {
     const before = state.songs.length

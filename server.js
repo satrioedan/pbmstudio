@@ -874,6 +874,7 @@ async function handleApi(req, res, url) {
 
     // GET /api/songs/:id  -> sekalian polling status ke provider bila masih proses
     if (method === "GET" && !sub) {
+      let siblings = []
       if (song.status === "processing" || song.status === "queued") {
         try {
           const st = song.provider === "uploadcover"
@@ -885,15 +886,17 @@ async function handleApi(req, res, url) {
                 : song.provider === "crun"
                   ? await crunProvider.getStatus(song.providerJobId, song.providerKeyId)
                   : await provider.getStatus(song.providerJobId, song.providerKeyId)
-          if (st.status !== song.status) {
-            store.updateSong(id, {
+          const incoming = Array.isArray(st.tracks) ? st.tracks.filter((t) => t && t.audioUrl) : []
+          const current = Array.isArray(song.tracks) ? song.tracks.filter((t) => t && t.audioUrl) : []
+          if (st.status !== song.status || incoming.length > current.length) {
+            siblings = store.applyResult(id, {
               status: st.status,
               audioUrl: st.audioUrl ?? song.audioUrl,
               imageUrl: st.imageUrl ?? song.imageUrl,
               tracks: st.tracks ?? song.tracks,
               error: st.error ? humanizeError(st.error) : null,
               errorCode: st.errorCode ?? null,
-            })
+            }).created
           }
         } catch { /* biarkan status lama */ }
       }
@@ -930,7 +933,10 @@ async function handleApi(req, res, url) {
           }
         } catch { /* biarkan */ }
       }
-      return sendJson(res, 200, { song: store.getSong(id) })
+      if (!siblings.length && song.status === "success" && Array.isArray(song.tracks) && song.tracks.filter((t) => t && t.audioUrl).length > 1) {
+        siblings = store.applyResult(id, {}).created
+      }
+      return sendJson(res, 200, { song: store.getSong(id), siblings })
     }
 
     // DELETE /api/songs/:id
@@ -961,7 +967,7 @@ async function handleApi(req, res, url) {
       const song = taskId ? store.getSongByJob(taskId) : null
       if (song && Array.isArray(items) && items.length) {
         const tracks = items.map((t, i) => ({ id: t.id || String(i + 1), audioUrl: t.audio_url || t.audioUrl || t.streamAudioUrl, imageUrl: t.image_url || t.imageUrl, title: t.title, tags: t.tags, duration: t.duration })).filter((t) => t.audioUrl)
-        if (tracks.length) store.updateSong(song.id, { status: "success", audioUrl: tracks[0].audioUrl, imageUrl: tracks[0].imageUrl || song.imageUrl, tracks, error: null })
+        if (tracks.length) store.applyResult(song.id, { status: "success", audioUrl: tracks[0].audioUrl, imageUrl: tracks[0].imageUrl || song.imageUrl, tracks, error: null })
       }
     } catch { /* abaikan callback malformed */ }
     return sendJson(res, 200, { ok: true })
@@ -978,7 +984,7 @@ async function handleApi(req, res, url) {
       const evt = uploadCover.parseCallback(raw)
       if (evt) {
         const song = store.getSongByJob(evt.jobId)
-        if (song) store.updateSong(song.id, {
+        if (song) store.applyResult(song.id, {
           status: evt.status,
           audioUrl: evt.audioUrl ?? song.audioUrl,
           imageUrl: evt.imageUrl ?? song.imageUrl,

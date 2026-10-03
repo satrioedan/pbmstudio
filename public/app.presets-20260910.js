@@ -1063,9 +1063,11 @@ function startPoll(id, key) {
     if (tries >= POLL_MAX) { stopPoll(k); return }
     state.pollRetries.set(k, tries + 1)
     try {
-      const { song } = await api("/api/songs/" + id)
+      const data = await api("/api/songs/" + id)
+      const song = data.song
       if (!song) { stopPoll(k); return }
       updateSongInState(song)
+      if (Array.isArray(data.siblings)) data.siblings.forEach(updateSongInState)
       if (state.selected && state.selected.id === id) renderDetail(song)
       const done = song.status !== "processing" && song.status !== "queued"
       const stemDone = song.stemStatus !== "processing"
@@ -1074,7 +1076,10 @@ function startPoll(id, key) {
       if (done && stemDone && wavDone && videoDone) {
         stopPoll(k)
         await refreshCredits()
-        if (song.status === "success") toast(`Lagu “${song.title || "Tanpa judul"}” berhasil dibuat`, "success")
+        if (song.status === "success") {
+          const count = 1 + (Array.isArray(data.siblings) ? data.siblings.length : 0)
+          toast(count > 1 ? count + " lagu berhasil dibuat" : `Lagu “${song.title || "Tanpa judul"}” berhasil dibuat`, "success")
+        }
         else if (song.status === "failed") toast(song.error || "Generate lagu gagal", "error")
       }
     } catch { /* lanjut */ }
@@ -1275,7 +1280,10 @@ async function submitUpload() {
 // ------------------------------ Detail modal --------------------------------
 async function openDetail(id) {
   try {
-    const { song } = await api("/api/songs/" + id)
+    const data = await api("/api/songs/" + id)
+    const song = data.song
+    updateSongInState(song)
+    if (Array.isArray(data.siblings)) data.siblings.forEach(updateSongInState)
     state.selected = song
     renderDetail(song)
     $("#detail").classList.remove("hidden")
