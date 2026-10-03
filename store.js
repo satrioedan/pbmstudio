@@ -2,6 +2,7 @@
 // Data lagu dan API key dipisah per browser/perangkat memakai ownerId.
 
 import "./config.js"
+import { databaseUrl, loadAppState, saveAppState } from "./lib/db.js"
 import { readFileSync, writeFileSync, existsSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { dirname, join } from "node:path"
@@ -65,6 +66,7 @@ function makeInitialState() {
 }
 
 function load() {
+  if (databaseUrl()) return makeInitialState()
   let s
   if (!existsSync(DB_FILE)) {
     s = makeInitialState()
@@ -78,7 +80,11 @@ function load() {
       } else s = makeInitialState()
     }
   }
+  return normalizeState(s)
+}
 
+function normalizeState(s) {
+  if (!s || typeof s !== "object") s = makeInitialState()
   if (!Array.isArray(s.songs)) s.songs = []
   if (!s.frontpage || typeof s.frontpage !== "object") s.frontpage = getDefaultFrontpage()
   if (!Array.isArray(s.frontpage.features)) s.frontpage.features = getDefaultFrontpage().features
@@ -113,11 +119,39 @@ export function maskKey(key) {
   return key.slice(0, 7) + "…" + key.slice(-4)
 }
 
-function persist(state) {
-  if (existsSync(DB_FILE)) {
-    try { writeFileSync(DB_FILE + ".bak", readFileSync(DB_FILE)) } catch {}
+let writeChain = Promise.resolve()
+let dbReady = !databaseUrl()
+
+function persist(next) {
+  if (databaseUrl()) {
+    if (!dbReady) throw new Error("Database belum siap. Coba lagi sebentar.")
+    const snapshot = JSON.parse(JSON.stringify(next))
+    const run = () => saveAppState(snapshot)
+    writeChain = writeChain.then(run, run)
+    return
   }
-  writeFileSync(DB_FILE, JSON.stringify(state, null, 2))
+  try {
+    if (existsSync(DB_FILE)) {
+      try { writeFileSync(DB_FILE + ".bak", readFileSync(DB_FILE)) } catch {}
+    }
+    writeFileSync(DB_FILE, JSON.stringify(next, null, 2))
+  } catch (e) {
+    if (e && (e.code === "EROFS" || e.code === "EACCES" || e.code === "EROFS")) {
+      throw new Error("Filesystem Vercel hanya bisa dibaca dan DATABASE_URL belum terbaca. API key tidak tersimpan.")
+    }
+    throw e
+  }
+}
+
+export function flushStore() {
+  return writeChain
+}
+
+async function hydrate() {
+  if (!databaseUrl()) return
+  const data = await loadAppState()
+  if (data && typeof data === "object") state = normalizeState(data)
+  dbReady = true
 }
 
 function ensureOwnerCredits() {
@@ -167,6 +201,7 @@ function addToPoolForOwner(arr, rawText) {
 }
 
 let state = load()
+export const storeReady = hydrate()
 
 export const store = {
   // ------------------------------ KREDIT -----------------------------------

@@ -22,7 +22,7 @@ import { kieUploadCover } from "./kieCover.presets-20260910.js"
 import { kieProvider } from "./kieProvider.presets-20260910.js"
 import { musicapiProvider } from "./musicapiProvider.js"
 import { crunProvider } from "./crunProvider.js"
-import { store, withOwner } from "./store.js"
+import { store, withOwner, storeReady, flushStore } from "./store.js"
 
 // BASE_PATH: dukungan pemasangan di sub-path (mis. https://host/evo/).
 // Kosong = root. Non-kosong = leading slash, no trailing slash (e.g. "/evo").
@@ -1324,6 +1324,7 @@ async function handleApi(req, res, url) {
       const rawKeys = (body.keys || body.key || "").toString()
       if (!rawKeys.trim()) return sendJson(res, 400, { error: "API key crun.ai kosong" })
       const added = store.addCrunKeys(rawKeys)
+      await flushStore()
       return sendJson(res, 201, { added, keys: store.listCrunKeys() })
     } catch (e) { return sendJson(res, 500, { error: "Gagal menyimpan API key crun.ai: " + e.message }) }
   }
@@ -1615,6 +1616,7 @@ const server = createServer(async (req, res) => {
   }
 
   try {
+    await storeReady
     // Passenger may append a slash to extensionless OAuth URLs.
     const mcpPath = url.pathname.replace(/\/+$/, "") || "/"
     if (mcpHandler?.matches(mcpPath)) {
@@ -1623,11 +1625,13 @@ const server = createServer(async (req, res) => {
     if (url.pathname.startsWith("/api/")) {
       const ownerId = getOwnerId(req, res)
       await withOwner(ownerId, () => handleApi(req, res, url))
+      await flushStore()
     } else {
       await serveStatic(req, res, url)
     }
   } catch (e) {
-    sendJson(res, 500, { error: "Server error: " + e.message })
+    if (!res.headersSent) sendJson(res, 500, { error: "Server error: " + e.message })
+    else console.error("[v0] request error after response:", e.message)
   }
 })
 
