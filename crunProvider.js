@@ -87,6 +87,29 @@ function parseTracks(task) {
   return { audioUrl: first.audioUrl || null, imageUrl: first.imageUrl || null, tracks: arr }
 }
 
+const AUDIO_MIME = {
+  mp3: "audio/mpeg", wav: "audio/wav", m4a: "audio/mp4", flac: "audio/flac",
+  ogg: "audio/ogg", aac: "audio/aac", opus: "audio/opus",
+}
+
+function mapVersion(model) {
+  const fromCatalog = getModel(model)?.modelVersion
+  if (fromCatalog) return fromCatalog
+  const raw = String(model || "").toLowerCase().replace(/[_\s]/g, "")
+  if (raw.includes("5.5") || raw.includes("55")) return "v5.5"
+  if (raw.includes("4.5plus") || raw.includes("45plus") || raw.includes("4.5+")) return "v4.5plus"
+  if (raw.includes("4.5all") || raw.includes("45all")) return "v4.5all"
+  if (raw.includes("4.5") || raw.includes("45")) return "v4.5"
+  if (raw.includes("v4")) return "v4"
+  return "v5"
+}
+
+function vocalCode(vocalGender) {
+  if (vocalGender === "male") return "m"
+  if (vocalGender === "female") return "f"
+  return null
+}
+
 function buildBody({ title, lyrics, style, type, vocalGender, model }) {
   const m = getModel(model)
   const version = m?.modelVersion || "v5"
@@ -112,6 +135,63 @@ function buildBody({ title, lyrics, style, type, vocalGender, model }) {
   return { model: "suno/music-generate", input }
 }
 
+function buildCoverBody({ audioUrl, title, lyrics, prompt, style, instrumental, vocalGender, model, negativeTags, audioWeight }) {
+  const version = mapVersion(model)
+  const isV4 = version === "v4"
+  const lyricText = String(lyrics || "").trim()
+  const styleText = String(style || prompt || "").trim()
+  const titleText = String(title || "").trim()
+  const input = { audio_url: audioUrl, model: version, instrumental: !!instrumental }
+  const gender = vocalCode(vocalGender)
+  // Custom hanya bila lirik ada (atau instrumental). Tanpa lirik, simple mode cukup.
+  if (lyricText || instrumental) {
+    input.mode = "custom"
+    input.title = (titleText || "Cover").slice(0, 80)
+    input.tags = (styleText || "pop").slice(0, isV4 ? 200 : 1000)
+    if (!instrumental) input.lyrics = lyricText.slice(0, isV4 ? 3000 : 5000)
+    if (gender) input.vocal_gender = gender
+    if (negativeTags) input.negative_tags = String(negativeTags).slice(0, 500)
+    const weight = Number(audioWeight)
+    if (Number.isFinite(weight)) input.audio_weight = Math.min(1, Math.max(0, weight > 1 ? weight / 100 : weight))
+  } else {
+    input.mode = "simple"
+    input.prompt = (styleText || titleText || "cover in a new style").slice(0, 500)
+  }
+  return { model: "suno/music-cover", input }
+}
+
+async function submitTask(body) {
+  const pool = poolForGenerate()
+  if (!pool.length) throw new Error("Belum ada API key crun.ai. Tambahkan di Setelan API Key bagian crun.ai.")
+  const payload = JSON.stringify(body)
+  const start = store.getCrunKeyCursor() % pool.length
+  let lastErr = null
+  for (let i = 0; i < pool.length; i++) {
+    const idx = (start + i) % pool.length
+    const { id, key } = pool[idx]
+    let r
+    try {
+      r = await call("/api/v1/client/job/CreateTask", key, { method: "POST", body: payload })
+    } catch (e) {
+      lastErr = new Error(`crun.ai ${maskKey(key)}: ${e.message}`)
+      continue
+    }
+    if (r.ok) {
+      const jobId = r.data?.data?.task_id
+      if (!jobId) throw new Error("Respons crun.ai tidak berisi task_id: " + JSON.stringify(r.data).slice(0, 300))
+      store.setCrunKeyCursor((idx + 1) % pool.length)
+      return { jobId, status: "processing", keyId: id }
+    }
+    if (ROTATE_CODES.has(r.code)) {
+      if (r.code === 402 && id !== "env") store.updateCrunKeyCredits(id, 0)
+      lastErr = new Error(`crun.ai ${maskKey(key)} (${r.code}): ${errorMessage(r.data, r.code)}`)
+      continue
+    }
+    throw new Error(errorMessage(r.data, r.code))
+  }
+  throw new Error("Semua API key crun.ai limit atau gagal. " + (lastErr ? lastErr.message : ""))
+}
+
 export const crunProvider = {
   hasKey() { return poolForGenerate().length > 0 },
 
@@ -121,36 +201,40 @@ export const crunProvider = {
       mockJobs.set(jobId, { finishAt: Date.now() + MOCK_DELAY, audioUrl: SAMPLE_AUDIO[Math.floor(Math.random() * SAMPLE_AUDIO.length)] })
       return { jobId, status: "processing", keyId: "mock" }
     }
+    return submitTask(buildBody(input))
+  },
+
+  async uploadAudio({ base64Data, fileName }) {
     const pool = poolForGenerate()
     if (!pool.length) throw new Error("Belum ada API key crun.ai. Tambahkan di Setelan API Key bagian crun.ai.")
+    const extMatch = String(fileName || "").match(/\.(mp3|wav|m4a|flac|ogg|aac|opus)$/i)
+    const ext = extMatch ? "." + extMatch[1].toLowerCase() : ".mp3"
+    const contentType = AUDIO_MIME[ext.slice(1)] || "audio/mpeg"
+    const bytes = Buffer.from(String(base64Data || ""), "base64")
+    if (!bytes.length) throw new Error("File audio kosong")
+    const { id, key } = pool[store.getCrunKeyCursor() % pool.length]
+    const q = new URLSearchParams({ content_type: contentType, ext })
+    const r = await call(`/api/v1/client/files/upload-url?${q}`, key)
+    if (!r.ok) throw new Error(errorMessage(r.data, r.code))
+    const presigned = r.data?.data?.presigned_url
+    const fileUrl = r.data?.data?.file_url
+    if (!presigned || !fileUrl) throw new Error("crun.ai tidak memberi URL upload")
+    const put = await fetch(presigned, { method: "PUT", headers: { "Content-Type": contentType }, body: bytes })
+    if (!put.ok) throw new Error("Upload audio ke crun.ai gagal (" + put.status + ")")
+    return { fileUrl, keyId: id }
+  },
 
-    const body = JSON.stringify(buildBody(input))
-    const start = store.getCrunKeyCursor() % pool.length
-    let lastErr = null
-    for (let i = 0; i < pool.length; i++) {
-      const idx = (start + i) % pool.length
-      const { id, key } = pool[idx]
-      let r
-      try {
-        r = await call("/api/v1/client/job/CreateTask", key, { method: "POST", body })
-      } catch (e) {
-        lastErr = new Error(`crun.ai ${maskKey(key)}: ${e.message}`)
-        continue
-      }
-      if (r.ok) {
-        const jobId = r.data?.data?.task_id
-        if (!jobId) throw new Error("Respons crun.ai tidak berisi task_id: " + JSON.stringify(r.data).slice(0, 300))
-        store.setCrunKeyCursor((idx + 1) % pool.length)
-        return { jobId, status: "processing", keyId: id }
-      }
-      if (ROTATE_CODES.has(r.code)) {
-        if (r.code === 402 && id !== "env") store.updateCrunKeyCredits(id, 0)
-        lastErr = new Error(`crun.ai ${maskKey(key)} (${r.code}): ${errorMessage(r.data, r.code)}`)
-        continue
-      }
-      throw new Error(errorMessage(r.data, r.code))
+  async cover(input) {
+    if (!input?.audioUrl || !/^https?:\/\//.test(input.audioUrl)) {
+      throw new Error("Cover crun.ai butuh URL audio publik dari lagu sumber")
     }
-    throw new Error("Semua API key crun.ai limit atau gagal. " + (lastErr ? lastErr.message : ""))
+    if (MOCK) {
+      const jobId = "crun_cover_mock_" + Math.random().toString(36).slice(2, 12)
+      mockJobs.set(jobId, { finishAt: Date.now() + MOCK_DELAY, audioUrl: SAMPLE_AUDIO[0] })
+      return { jobId, status: "processing", keyId: "mock", uploadUrl: input.audioUrl }
+    }
+    const job = await submitTask(buildCoverBody(input))
+    return { ...job, uploadUrl: input.audioUrl }
   },
 
   async getStatus(jobId, keyId) {

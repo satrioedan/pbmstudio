@@ -250,8 +250,8 @@ async function handleApi(req, res, url) {
     const audioWeight = body.audioWeight
     const instrumental = body.instrumental === true || body.type === "instrumental"
     const vocalGender = ["male", "female", "auto"].includes(body.vocalGender) ? body.vocalGender : "auto"
-    if (body.provider && !["sunoapi", "kie"].includes(body.provider)) return sendJson(res, 400, { error: "Provider cover telah berubah. Muat ulang halaman, lalu pilih KIE API atau SunoAPI." })
-    const selectedProvider = body.provider === "kie" ? "kie" : "sunoapi"
+    if (body.provider && !["sunoapi", "kie", "crun"].includes(body.provider)) return sendJson(res, 400, { error: "Provider cover tidak dikenal. Pilih crun.ai, KIE API, atau SunoAPI." })
+    const selectedProvider = body.provider === "kie" ? "kie" : body.provider === "crun" ? "crun" : "sunoapi"
     const supportedCoverModels = selectedProvider === "kie" ? ["V4", "V4_5", "V4_5PLUS", "V4_5ALL", "V5", "V5_5"] : UPLOAD_MODELS
     const model = supportedCoverModels.includes(body.model) ? body.model : "V4_5PLUS"
 
@@ -266,7 +266,21 @@ async function handleApi(req, res, url) {
     let job, providerName, creditType, cost
     let uploadUrl = null
     
-    if (selectedProvider === "sunoapi") {
+    if (selectedProvider === "crun") {
+      if (!crunProvider.hasKey()) return sendJson(res, 400, { error: "Belum ada API key crun.ai. Tambahkan di Setelan API Key bagian crun.ai." })
+      try {
+        const uploaded = await crunProvider.uploadAudio({ base64Data, fileName })
+        uploadUrl = uploaded.fileUrl
+        job = await crunProvider.cover({
+          audioUrl: uploadUrl, instrumental, style, lyrics: prompt, prompt, title, model, vocalGender, negativeTags, audioWeight,
+        })
+      } catch (e) {
+        return sendJson(res, 502, { error: "crun.ai gagal: " + e.message })
+      }
+      providerName = "crun"
+      creditType = null
+      cost = UPLOAD_COVER_COST
+    } else if (selectedProvider === "sunoapi") {
       // Use sunoapi.org upload & cover
       if (!uploadCover.hasKey()) {
         return sendJson(res, 400, { error: "Belum ada kunci sunoapi.org. Atur di Setelan API Key bagian Upload & Cover." })
@@ -308,7 +322,7 @@ async function handleApi(req, res, url) {
       type: instrumental ? "instrumental" : "vocal",
       vocalGender,
       model, 
-      modelLabel: selectedProvider === "sunoapi" ? "sunoapi.org " + model : "KIE Cover " + model,
+      modelLabel: selectedProvider === "sunoapi" ? "sunoapi.org " + model : selectedProvider === "crun" ? "crun.ai Cover " + model : "KIE Cover " + model,
       credits: cost,
       status: job.status || "processing",
       audioUrl: null, imageUrl: null, tracks: [], error: null, liked: false,
@@ -341,6 +355,52 @@ async function handleApi(req, res, url) {
     if (method === "POST" && sub === "/cover") {
       if (song.status !== "success") {
         return sendJson(res, 400, { error: "Lagu harus selesai dulu sebelum diaransemen ulang" })
+      }
+      if (song.provider === "crun") {
+        if (!song.audioUrl) return sendJson(res, 400, { error: "Lagu crun.ai ini belum punya audio, tidak bisa di-cover" })
+        if (!crunProvider.hasKey()) return sendJson(res, 400, { error: "Belum ada API key crun.ai. Tambahkan di Setelan API Key bagian crun.ai." })
+        const body = await readBody(req)
+        const style = (body.style || "").toString().slice(0, LIMITS.style)
+        const prompt = (body.prompt || "").toString().slice(0, LIMITS.lyrics)
+        const title = (body.title || "").toString().slice(0, LIMITS.title)
+        const negativeTags = (body.negativeTags || "").toString().slice(0, 500)
+        const audioWeight = body.audioWeight
+        if (!style.trim()) return sendJson(res, 400, { error: "Gaya/genre baru wajib diisi untuk aransemen ulang" })
+        let job
+        try {
+          job = await crunProvider.cover({
+            audioUrl: song.audioUrl,
+            style,
+            lyrics: prompt || song.lyrics,
+            title: title || `${song.title} (Aransemen)`,
+            instrumental: song.type === "instrumental",
+            vocalGender: song.vocalGender,
+            model: song.model,
+            negativeTags,
+            audioWeight,
+          })
+        } catch (e) {
+          return sendJson(res, 502, { error: "crun.ai gagal: " + e.message })
+        }
+        const now = Date.now()
+        const cover = store.addSong({
+          id: randomUUID(),
+          title: title || `${song.title} (Aransemen)`,
+          lyrics: prompt || song.lyrics,
+          style: style || song.style,
+          type: song.type, vocalGender: song.vocalGender,
+          model: song.model, modelLabel: "crun.ai Cover", credits: COVER_COST,
+          status: job.status || "processing",
+          audioUrl: null, imageUrl: null, tracks: [], error: null, liked: false,
+          provider: "crun",
+          providerJobId: job.jobId,
+          providerKeyId: job.keyId || null,
+          isCover: true, coverOf: song.id,
+          uploadUrl: song.audioUrl,
+          negativeTags: negativeTags || null, audioWeight: (audioWeight === undefined ? null : audioWeight),
+          createdAt: now, updatedAt: now,
+        })
+        return sendJson(res, 201, { song: cover, credits: store.getAllCredits() })
       }
       if (!song.providerJobId) {
         return sendJson(res, 400, { error: "Lagu ini tidak punya job induk, tidak bisa diaransemen ulang" })
@@ -396,7 +456,27 @@ async function handleApi(req, res, url) {
 
       let retryJob, retryCreditType, retryCost
 
-      if (song.isUpload && song.provider === "kie") {
+      if (song.provider === "crun" && (song.isUpload || song.isCover)) {
+        const source = song.uploadUrl || (song.coverOf ? store.getSong(song.coverOf)?.audioUrl : null)
+        if (!source) return sendJson(res, 400, { error: "Audio sumber cover tidak tersimpan. Buat cover baru dari lagu atau file aslinya." })
+        retryCreditType = null
+        retryCost = COVER_COST
+        try {
+          retryJob = await crunProvider.cover({
+            audioUrl: source,
+            instrumental: song.type === "instrumental",
+            style: song.style,
+            lyrics: song.lyrics,
+            title: song.title,
+            model: song.model,
+            vocalGender: song.vocalGender,
+            negativeTags: song.negativeTags,
+            audioWeight: song.audioWeight,
+          })
+        } catch (e) {
+          return sendJson(res, 502, { error: "crun.ai gagal: " + e.message })
+        }
+      } else if (song.isUpload && song.provider === "kie") {
         if (!song.uploadUrl) return sendJson(res, 400, {error: "Silakan upload ulang audio sumber."})
         retryCreditType = null
         retryCost = UPLOAD_COVER_COST
