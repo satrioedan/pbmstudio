@@ -1,0 +1,103 @@
+/* Kampung Lagu visual layer for ULAS / GEJEMUZIK */
+:root {
+  --kampung-ink: #1d1d1b;
+  --kampung-paper: #f6f1e8;
+  --kampung-card: #fffdf8;
+  --kampung-accent: #e86445;
+  --kampung-accent-dark: #c84b31;
+  --kampung-line: #ded5c8;
+  --kampung-muted: #746d64;
+  --kampung-sidebar: #181817;
+  --kampung-radius: 18px;
+}
+
+html, body { background: var(--kampung-paper) !important; }
+body { color: var(--kampung-ink) !important; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif !important; }
+.app { background: var(--kampung-paper) !important; }
+.sidebar {
+  width: 246px !important;
+  background: var(--kampung-sidebar) !important;
+  color: #fff !important;
+  border-right: 0 !important;
+  padding: 28px 18px !important;
+}
+.side-brand { padding: 0 8px 24px !important; border-bottom: 1px solid #353532 !important; margin-bottom: 18px !important; }
+.side-brand img { width: 44px !important; height: 44px !important; border-radius: 14px !important; }
+.brand-name { font-size: 1.05rem !important; font-weight: 800 !important; letter-spacing: -.02em !important; text-transform: none !important; }
+.brand-sub { color: #aaa79f !important; font-size: .76rem !important; }
+.side-nav { gap: 5px !important; }
+.nav-item {
+  border-radius: 11px !important;
+  color: #c9c6be !important;
+  padding: 11px 13px !important;
+  font-size: .91rem !important;
+  font-weight: 650 !important;
+  border: 1px solid transparent !important;
+}
+.nav-item:hover { background: #292927 !important; color: #fff !important; }
+.nav-item.active { background: var(--kampung-accent) !important; color: #fff !important; box-shadow: none !important; }
+#theme-toggle-side { margin-top: 12px !important; background: #252523 !important; }
+.side-credits { border-top: 1px solid #353532 !important; color: #aaa79f !important; }
+.side-credits strong { color: #fff !important; }
+.main { background: var(--kampung-paper) !important; }
+.view { max-width: 1320px; margin: 0 auto; padding: 38px 42px 88px !important; }
+.frontpage { max-width: none !important; padding: 0 !important; }
+.fp-bg { display: none !important; }
+.fp-body {
+  max-width: 980px !important;
+  margin: 0 auto !important;
+  padding: 72px 48px 42px !important;
+  text-align: left !important;
+  align-items: flex-start !important;
+}
+.fp-badge { color: var(--kampung-accent-dark) !important; background: transparent !important; padding: 0 !important; letter-spacing: .08em !important; text-transform: uppercase !important; font-size: .75rem !important; }
+.fp-title { color: var(--kampung-ink) !important; font-size: clamp(3rem, 7vw, 6.7rem) !important; line-height: .92 !important; letter-spacing: -.07em !important; margin: 18px 0 12px !important; text-shadow: none !important; }
+.fp-sub { color: var(--kampung-accent) !important; font-family: Georgia, serif !important; font-style: italic !important; font-size: clamp(1.4rem, 3vw, 2.3rem) !important; }
+.fp-desc { color: var(--kampung-muted) !important; max-width: 720px !important; font-size: 1.05rem !important; line-height: 1.8 !important; }
+.fp-feats { display: grid !important; grid-template-columns: repeat(2, minmax(0,1fr)) !important; gap: 12px !important; width: 100% !important; margin: 28px 0 !important; }
+.fp-feat { background: var(--kampung-card) !important; border: 1px solid var(--kampung-line) !important; border-radius: 14px !important; color: var(--kampung-ink) !important; padding: 16px !important; box-shadow: none !important; }
+.fp-cta, .btn-primary, .create-generate-btn, .btn-action { background: var(--kampung-accent) !important; color: #fff !important; border: 0 !important; border-radius: 12px !important; box-shadow: none !important; }
+.fp-cta:hover, .btn-primary:hover, .create-generate-btn:hover, .btn-action:hover { background: var(--kampung-accent-dark) !important; transform: translateY(-1px) !important; }
+.fp-footer { color: var(--kampung-muted) !important; }
+.fp-blocks { max-width: 980px !important; margin: 0 auto !important; padding: 0 48px 80px !important; }
+.settings-card, .create-form, .library-panel, .liked-panel, .mastering-card, .homofon-card, .detail-panel, .card {
+  background: var(--kampung-card) !important;
+  border: 1px solid var(--kampung-line) !important;
+  border-radius: var(--kampung-radius) !important;
+  box-shadow: 0 10px 30px rgba(38, 31, 23, .05) !important;
+}
+input, textarea, select { background: #fff !important; color: var(--kampung-ink) !important; border-color: var(--kampung-line) !important; border-radius: 11px !important; }
+input:focus, textarea:focus, select:focus { border-color: var(--kampung-accent) !important; box-shadow: 0 0 0 3px rgba(232,100,69,.12) !important; }
+.segment { background: #ece5da !important; border-color: var(--kampung-line) !important; }
+.segment button.active, .filter-btn.active { background: var(--kampung-ink) !important; color: #fff !important; }
+.style-pill { border-color: var(--kampung-line) !important; background: #fff !important; color: var(--kampung-muted) !important; }
+.style-pill:hover { border-color: var(--kampung-accent) !important; color: var(--kampung-accent-dark) !important; }
+.boost-style-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 4px; }
+.boost-style-bar span { color: var(--kampung-muted); font-size: .78rem; }
+.boost-style-btn { border: 1px solid var(--kampung-accent) !important; background: rgba(232,100,69,.09) !important; color: var(--kampung-accent-dark) !important; border-radius: 10px !important; padding: 9px 13px !important; font-weight: 800 !important; cursor: pointer; white-space: nowrap; }
+.boost-style-btn:hover { background: var(--kampung-accent) !important; color: #fff !important; }
+.create-hero, .settings-hero { max-width: 1040px !important; margin: 0 auto !important; }
+.create-subtitle { color: var(--kampung-muted) !important; }
+.kampung-route {
+  display: grid; grid-template-columns: 150px minmax(220px, 1fr); align-items: center; gap: 16px;
+  margin: 0 auto 18px; max-width: 1040px; padding: 15px 18px;
+  background: var(--kampung-card); border: 1px solid var(--kampung-line); border-radius: 14px;
+}
+.kampung-route label { font-weight: 800; font-size: .88rem; }
+.kampung-route small { display: block; color: var(--kampung-muted); font-weight: 500; margin-top: 2px; }
+.kampung-route select { width: 100%; }
+.settings-section .section-title { color: var(--kampung-ink) !important; }
+.mini-player { background: var(--kampung-ink) !important; border-color: #393936 !important; }
+.topbar { background: var(--kampung-sidebar) !important; border-bottom: 0 !important; color: #fff !important; }
+.bottom-nav { background: rgba(24,24,23,.97) !important; border-top: 0 !important; }
+.bn-item { color: #aaa79f !important; }
+.bn-item.active { color: #fff !important; }
+
+@media (max-width: 900px) {
+  .view { padding: 24px 18px 104px !important; }
+  .fp-body { padding: 42px 22px 28px !important; }
+  .fp-blocks { padding: 0 22px 110px !important; }
+  .fp-feats { grid-template-columns: 1fr !important; }
+  .kampung-route { grid-template-columns: 1fr; gap: 9px; }
+  .boost-style-bar { align-items: flex-start; flex-direction: column; }
+}

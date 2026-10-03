@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --kampung-ink: #fafaf9;
+  --kampung-paper: #070604;
+  --kampung-card: #0f0f12;
+  --kampung-accent: #facc15;
+  --kampung-accent-dark: #fde047;
+  --kampung-line: rgba(250, 204, 21, .18);
+  --kampung-muted: #a1a1aa;
+  --kampung-sidebar: #030303;
+}
+
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+html[data-theme="dark"] .app,
+html[data-theme="dark"] .main {
+  background: #070604 !important;
+  color: #fafaf9 !important;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+}
+
+html[data-theme="dark"] .sidebar,
+html[data-theme="dark"] .topbar,
+html[data-theme="dark"] .bottom-nav {
+  background: #030303 !important;
+  color: #fafaf9 !important;
+  border-color: rgba(250, 204, 21, .12) !important;
+}
+
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] .fp-title,
+html[data-theme="dark"] .fp-sub,
+html[data-theme="dark"] .section-title,
+html[data-theme="dark"] .create-title,
+html[data-theme="dark"] .settings-title {
+  color: #f5f5f4 !important;
+  font-family: Montserrat, "Plus Jakarta Sans", system-ui, sans-serif !important;
+  text-shadow: none !important;
+}
+
+html[data-theme="dark"] p,
+html[data-theme="dark"] label,
+html[data-theme="dark"] small,
+html[data-theme="dark"] .fp-desc,
+html[data-theme="dark"] .fp-footer,
+html[data-theme="dark"] .create-subtitle,
+html[data-theme="dark"] .boost-style-bar span,
+html[data-theme="dark"] .kampung-route small {
+  color: #a1a1aa !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+}
+
+html[data-theme="dark"] .fp-sub,
+html[data-theme="dark"] .fp-badge {
+  color: #f5d78e !important;
+  font-style: normal !important;
+}
+
+html[data-theme="dark"] .settings-card,
+html[data-theme="dark"] .create-form,
+html[data-theme="dark"] .library-panel,
+html[data-theme="dark"] .liked-panel,
+html[data-theme="dark"] .mastering-card,
+html[data-theme="dark"] .homofon-card,
+html[data-theme="dark"] .detail-panel,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .fp-feat,
+html[data-theme="dark"] .kampung-route {
+  background: #0f0f12 !important;
+  color: #f5f5f4 !important;
+  border-color: rgba(250, 204, 21, .18) !important;
+  box-shadow: 0 18px 42px -26px rgba(250, 204, 21, .32), 0 8px 24px -12px rgba(0, 0, 0, .78) !important;
+}
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+  background: #141418 !important;
+  color: #fafaf9 !important;
+  -webkit-text-fill-color: #fafaf9;
+  border-color: rgba(250, 204, 21, .18) !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #71717a !important;
+  -webkit-text-fill-color: #71717a;
+}
+
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] textarea:focus,
+html[data-theme="dark"] select:focus {
+  border-color: rgba(250, 204, 21, .55) !important;
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, .12) !important;
+}
+
+html[data-theme="dark"] .nav-item { color: #d6d3d1 !important; }
+html[data-theme="dark"] .nav-item:hover,
+html[data-theme="dark"] #theme-toggle-side { background: #141414 !important; color: #fafaf9 !important; }
+html[data-theme="dark"] .nav-item.active,
+html[data-theme="dark"] .fp-cta,
+html[data-theme="dark"] .btn-primary,
+html[data-theme="dark"] .create-generate-btn,
+html[data-theme="dark"] .btn-action {
+  background: #facc15 !important;
+  color: #1a1300 !important;
+}
+
+html[data-theme="dark"] .boost-style-btn,
+html[data-theme="dark"] .style-pill {
+  background: rgba(250, 204, 21, .10) !important;
+  color: #fde047 !important;
+  border-color: rgba(250, 204, 21, .35) !important;
+}
+
+html[data-theme="dark"] .segment { background: #0a0a0a !important; border-color: rgba(250, 204, 21, .18) !important; }
+html[data-theme="dark"] .segment button.active,
+html[data-theme="dark"] .filter-btn.active { background: #facc15 !important; color: #1a1300 !important; }
+
+/* Notifikasi global PBM Studio */
+.toast.pbm-toast {
+  position: fixed !important;
+  z-index: 99999 !important;
+  right: 22px !important;
+  bottom: 22px !important;
+  left: auto !important;
+  display: grid !important;
+  grid-template-columns: 42px 28px minmax(180px, 1fr) 26px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: min(440px, calc(100vw - 28px)) !important;
+  padding: 13px 14px !important;
+  border: 1px solid rgba(250, 204, 21, .25) !important;
+  border-radius: 15px !important;
+  background: rgba(15, 15, 18, .97) !important;
+  color: #fafaf9 !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255, 255, 255, .04) inset !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+}
+.toast.pbm-toast.hidden { display: none !important; }
+.pbm-toast-logo { width: 42px; height: 42px; border-radius: 11px; object-fit: cover; }
+.pbm-toast-symbol { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 999px; font-weight: 900; }
+.pbm-toast-message { color: #fafaf9 !important; font-size: .9rem; font-weight: 650; line-height: 1.45; }
+.pbm-toast-close { padding: 0 !important; border: 0 !important; background: transparent !important; color: #a1a1aa !important; font-size: 22px !important; cursor: pointer; }
+.pbm-toast.success { border-color: rgba(74, 222, 128, .42) !important; }
+.pbm-toast.success .pbm-toast-symbol { background: rgba(74, 222, 128, .16); color: #4ade80; }
+.pbm-toast.error { border-color: rgba(248, 113, 113, .5) !important; }
+.pbm-toast.error .pbm-toast-symbol { background: rgba(248, 113, 113, .16); color: #f87171; }
+.pbm-toast.warning .pbm-toast-symbol,
+.pbm-toast.info .pbm-toast-symbol { background: rgba(250, 204, 21, .15); color: #facc15; }
+@media (max-width: 600px) {
+  .toast.pbm-toast { right: 14px !important; bottom: 88px !important; grid-template-columns: 38px 24px minmax(0, 1fr) 22px !important; }
+  .pbm-toast-logo { width: 38px; height: 38px; }
+}

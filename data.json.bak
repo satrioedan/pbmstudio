@@ -1,0 +1,1021 @@
+{
+  "songs": [
+    {
+      "id": "027a8516-7f38-4590-922a-e496d88bfdc0",
+      "title": "Tau",
+      "lyrics": "Hmm...\nHaaa...\n[Verse 1]\nMalam ini sunyi lagi\nBayangmu datang menghampiri\nDi sudut kamar yang sepi\nMasih tersimpan janji-janji\nKau yang dulu ku percaya\nKini pergi tanpa suara\nMeninggalkan luka lama\nYang tak mampu ku lupa\n[Pre-Chorus]\nAku menahan air mata\nSaat namamu disebut orang\nSeakan hati tak rela\nKau bahagia dengannya\n[Chorus]\nMengapa aku yang kau tinggalkan\nSaat cinta sedang ku pertahankan\nKau pilih dia, kau buang semua\nImpian yang pernah kita bina\nSakitnya hati tak terucapkan\nRinduku jatuh dalam kehancuran\nBiarlah aku menangis sendiri\nAsal kau tahu ku pernah mencintai\n[Verse 2]\nFoto kita masih tersimpan\nWalau hatimu telah berpindah\nSenyummu yang dulu menenangkan\nKini menjadi luka terindah\nAndai waktu bisa kembali\nTakkan ku biarkan kau pergi\nNamun semua telah terjadi\nKau bukan lagi milikku kini\n[Pre-Chorus]\nAku mencoba tuk menerima\nWalau perih menusuk jiwa\nBila memang ini akhirnya\nKu lepaskan dengan air mata\n[Chorus]\nMengapa aku yang kau tinggalkan\nSaat cinta sedang ku pertahankan\nKau pilih dia, kau buang semua\nImpian yang pernah kita bina\nSakitnya hati tak terucapkan\nRinduku jatuh dalam kehancuran\nBiarlah aku menangis sendiri\nAsal kau tahu ku pernah mencintai\n[Bridge]\nPergilah kasih, jangan kembali\nBiar ku rawat luka ini\nMeski namamu masih di hati\nKu sadar kau takkan kumiliki\n[Final Chorus]\nMengapa aku yang kau tinggalkan\nSaat cinta sedang ku pertahankan\nKau pilih dia, kau buang semua\nImpian yang pernah kita bina\nSakitnya hati tak terucapkan\nRinduku jatuh dalam kehancuran\nBiarlah aku menangis sendiri\nAsal kau tahu ku pernah mencintai\n[Outro]\nAsal kau tahu...\nKu pernah mencintai...",
+      "style": "Pop Melayu sedih, slow ballad, emotional male vocal, piano intro, acoustic guitar, soft strings, mellow drum, heartbreaking, radio friendly, 80 BPM",
+      "type": "vocal",
+      "vocalGender": "auto",
+      "model": "suno-v5.5",
+      "modelLabel": "Suno V5.5",
+      "credits": 11,
+      "status": "success",
+      "audioUrl": "https://cdn2.apiframe.ai/audio/74211830-ca60-4210-9b55-2118468b1df8-0.mp3",
+      "imageUrl": "https://cdn2.apiframe.ai/audio/74211830-ca60-4210-9b55-2118468b1df8-0.jpeg",
+      "tracks": [
+        {
+          "id": "8cbe3bb4-9f0c-4913-b4ea-605560ad7a30",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/74211830-ca60-4210-9b55-2118468b1df8-0.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/74211830-ca60-4210-9b55-2118468b1df8-0.jpeg",
+          "title": "Tau",
+          "tags": "Pop Melayu sedih, slow ballad, emotional male vocal, piano intro, acoustic guitar, soft strings, mellow drum, heartbreaking, radio friendly, 80 BPM",
+          "duration": 479.4
+        },
+        {
+          "id": "6e8d5df1-33ef-4f3c-8551-6ec4b978be62",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/74211830-ca60-4210-9b55-2118468b1df8-1.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/74211830-ca60-4210-9b55-2118468b1df8-1.jpeg",
+          "title": "Tau",
+          "tags": "Pop Melayu sedih, slow ballad, emotional male vocal, piano intro, acoustic guitar, soft strings, mellow drum, heartbreaking, radio friendly, 80 BPM",
+          "duration": 479.4
+        }
+      ],
+      "error": null,
+      "liked": false,
+      "providerJobId": "74211830-ca60-4210-9b55-2118468b1df8",
+      "providerKeyId": "env",
+      "createdAt": 1781871518496,
+      "updatedAt": 1781871936798
+    },
+    {
+      "id": "724e779b-59d9-434a-8c14-6ca95ba7dd9f",
+      "title": "Titik jenuh",
+      "lyrics": "Verse 1\nJangan tunggu rakyat jenuh\nMenahan lapar, menahan pilu\nJangan tunggu suara kecil\nBerubah badai di jalan sunyi\nPre-Chorus\nSebab diam bukan berarti rela\nSenyum bukan tanda bahagia\nAda luka yang terus disimpan\nMenunggu waktu jadi perlawanan\nChorus\nJangan tunggu reformasi\nTeriak lagi di bumi ini\nSaat janji tak lagi dipercaya\nRakyat bangkit membawa nyata\nVerse 2\nKursi tinggi jangan terlena\nKeadilan jangan cuma cerita\nBila hukum tajam memilih\nKepercayaan akan tersisih\nChorus\nJangan tunggu reformasi\nTeriak lagi di bumi ini\nSaat sabar sampai batasnya\nPerubahan jadi kenyataan\nOutro\nNegerikuuuu…\nDengarlah sebelum terlambat\nSebab suara rakyat\nBisa menjadi sejarah.",
+      "style": "Emotional Indonesian protest ballad, Pop Melayu sad song, slow tempo, piano intro, acoustic guitar, cinematic strings, deep male vocal, melancholic verse, powerful anthem chorus, lyrics about reformasi, rakyat kecil, justice, corruption, and hope, serious poetic tone, dramatic ending, Indonesian language",
+      "type": "vocal",
+      "vocalGender": "auto",
+      "model": "suno-v5.5",
+      "modelLabel": "Suno V5.5",
+      "credits": 11,
+      "status": "success",
+      "audioUrl": "https://cdn2.apiframe.ai/audio/33d5b5e4-ad7f-4a47-940e-67f388229bb0-0.mp3",
+      "imageUrl": "https://cdn2.apiframe.ai/audio/33d5b5e4-ad7f-4a47-940e-67f388229bb0-0.jpeg",
+      "tracks": [
+        {
+          "id": "048e1b39-ff0b-48f4-9b4e-62f26eaa382e",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/33d5b5e4-ad7f-4a47-940e-67f388229bb0-0.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/33d5b5e4-ad7f-4a47-940e-67f388229bb0-0.jpeg",
+          "title": "Titik jenuh",
+          "tags": "Emotional Indonesian protest ballad, Pop Melayu sad song, slow tempo, piano intro, acoustic guitar, cinematic strings, deep male vocal, melancholic verse, powerful anthem chorus, lyrics about reformasi, rakyat kecil, justice, corruption, and hope, serious poetic tone, dramatic ending, Indonesian language",
+          "duration": 219.96
+        },
+        {
+          "id": "43b423bd-d755-4428-9d45-3f4410764780",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/33d5b5e4-ad7f-4a47-940e-67f388229bb0-1.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/33d5b5e4-ad7f-4a47-940e-67f388229bb0-1.jpeg",
+          "title": "Titik jenuh",
+          "tags": "Emotional Indonesian protest ballad, Pop Melayu sad song, slow tempo, piano intro, acoustic guitar, cinematic strings, deep male vocal, melancholic verse, powerful anthem chorus, lyrics about reformasi, rakyat kecil, justice, corruption, and hope, serious poetic tone, dramatic ending, Indonesian language",
+          "duration": 212.36
+        }
+      ],
+      "error": null,
+      "liked": false,
+      "providerJobId": "33d5b5e4-ad7f-4a47-940e-67f388229bb0",
+      "providerKeyId": "53cbf249-63e5-4888-963a-a9f6a14da48a",
+      "createdAt": 1781912826792,
+      "updatedAt": 1781913462144,
+      "ownerId": "c_8719a06c-eb94-4705-8c72-072f2fffa219"
+    },
+    {
+      "id": "fb052f3d-ef97-4f6f-863c-f1ca49b57916",
+      "title": "Wajah Negeri yang Letih",
+      "lyrics": "Verse 1\nInikah wajah negeriku\nYang dulu menjanjikan perubahan\nKata jujur dikibarkan tinggi\nTapi kini tinggal bayangan\nPre-Chorus\nYang dulu mengepal tangan\nKini nyaman di kekuasaan\nRakyat kecil masih menunggu\nDi jalan penuh debu\nChorus\nOh negeriku yang letih\nJanji tumbuh lalu mati\nKeadilan memilih arah\nSaat rakyat menahan resah\nOutro\nNegerikuuuu…\nApakah perubahan hanya nama\nAtau luka lama\nYang ditutup dengan cerita?",
+      "style": "Indonesian cinematic protest anthem, slow dramatic ballad, emotional male vocal, piano and strings, acoustic guitar, powerful chorus, social criticism, reformasi theme, rakyat voice, justice and truth, melancholic verse, rising dramatic chorus, epic orchestral ending, patriotic but sad atmosphere, poetic Indonesian lyrics",
+      "type": "vocal",
+      "vocalGender": "auto",
+      "model": "suno-v5.5",
+      "modelLabel": "Suno V5.5",
+      "credits": 11,
+      "status": "success",
+      "audioUrl": "https://cdn2.apiframe.ai/audio/4367c395-d46d-4773-ba2e-c4b5e37cfca3-0.mp3",
+      "imageUrl": "https://cdn2.apiframe.ai/audio/4367c395-d46d-4773-ba2e-c4b5e37cfca3-0.jpeg",
+      "tracks": [
+        {
+          "id": "d46d5f85-e89e-44ff-a366-1b4b4820c6b8",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/4367c395-d46d-4773-ba2e-c4b5e37cfca3-0.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/4367c395-d46d-4773-ba2e-c4b5e37cfca3-0.jpeg",
+          "title": "Wajah Negeri yang Letih",
+          "tags": "Indonesian cinematic protest anthem, slow dramatic ballad, emotional male vocal, piano and strings, acoustic guitar, powerful chorus, social criticism, reformasi theme, rakyat voice, justice and truth, melancholic verse, rising dramatic chorus, epic orchestral ending, patriotic but sad atmosphere, poetic Indonesian lyrics",
+          "duration": 161.92
+        },
+        {
+          "id": "39cf8e7d-1a10-4209-a3f2-21c1a13e0681",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/4367c395-d46d-4773-ba2e-c4b5e37cfca3-1.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/4367c395-d46d-4773-ba2e-c4b5e37cfca3-1.jpeg",
+          "title": "Wajah Negeri yang Letih",
+          "tags": "Indonesian cinematic protest anthem, slow dramatic ballad, emotional male vocal, piano and strings, acoustic guitar, powerful chorus, social criticism, reformasi theme, rakyat voice, justice and truth, melancholic verse, rising dramatic chorus, epic orchestral ending, patriotic but sad atmosphere, poetic Indonesian lyrics",
+          "duration": 151.6
+        }
+      ],
+      "error": null,
+      "liked": false,
+      "providerJobId": "4367c395-d46d-4773-ba2e-c4b5e37cfca3",
+      "providerKeyId": "5214e9af-2d7f-42ed-8160-dc38efda3967",
+      "createdAt": 1781914299577,
+      "updatedAt": 1781914951324,
+      "ownerId": "c_8719a06c-eb94-4705-8c72-072f2fffa219"
+    },
+    {
+      "id": "d7c8b4d9-61e8-46dd-9b05-e7c92702a5d4",
+      "title": "Jangan tunggu",
+      "lyrics": "Verse 1\nDi layar kalian tersenyum rapi\nBicara rakyat setiap pagi\nTapi di pasar harga meninggi\nYang lapar disuruh bersabar lagi\nKatanya negeri sedang baik-baik saja\nKatanya semua demi bersama\nTapi mengapa yang kecil makin sesak\nSementara yang tinggi makin gemerlap\nPre-Chorus\nJangan bungkam suara yang lelah\nJangan anggap diam itu pasrah\nSebab luka yang lama disimpan\nBisa meledak jadi tuntutan\nChorus\nJangan tunggu rakyat sampai jenuh\nJangan tunggu jalanan penuh\nReformasi bukan sekadar kenangan\nBila janji hanya jadi hiasan\nJangan tunggu suara menggema\nMenjadi badai di depan istana\nSaat keadilan tak lagi nyata\nReformasi akan jadi kenyataan\nVerse 2\nKursi empuk membuat lupa\nBahwa kuasa bukan warisan keluarga\nHukum jangan tajam ke bawah\nLalu tumpul saat menyentuh mahkota\nKalian sibuk merawat citra\nRakyat sibuk mencari berasnya\nKalian bicara kemajuan bangsa\nTapi rakyat menghitung utang di meja\nChorus\nJangan tunggu rakyat sampai jenuh\nJangan tunggu jalanan penuh\nReformasi bukan sekadar kenangan\nBila janji hanya jadi hiasan\nJangan tunggu suara menggema\nMenjadi badai di depan istana\nSaat keadilan tak lagi nyata\nReformasi akan jadi kenyataan\nOutro\nNegeriku… dengarlah sebelum terlambat\nRakyat kecil bukan alat\nBila kepercayaan sudah patah\nTakhta pun bisa kehilangan arah.",
+      "style": "Indonesian protest ballad, emotional male vocal, slow dramatic pop Melayu rock, piano intro, acoustic guitar, cinematic strings, powerful chorus, sharp social criticism, satire about current government, justice for rakyat kecil, corruption, broken promises, reformasi spirit, melancholic verse, anthem chorus, serious poetic Indonesian lyrics.",
+      "type": "vocal",
+      "vocalGender": "male",
+      "model": "suno-v5.5",
+      "modelLabel": "Suno V5.5",
+      "credits": 11,
+      "status": "success",
+      "audioUrl": "https://cdn2.apiframe.ai/audio/170ef4dc-d566-4c02-b8fa-706c659e2b4e-0.mp3",
+      "imageUrl": "https://cdn2.apiframe.ai/audio/170ef4dc-d566-4c02-b8fa-706c659e2b4e-0.jpeg",
+      "tracks": [
+        {
+          "id": "94d0ecd9-0450-4e74-a83e-9c8f43a2b500",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/170ef4dc-d566-4c02-b8fa-706c659e2b4e-0.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/170ef4dc-d566-4c02-b8fa-706c659e2b4e-0.jpeg",
+          "title": "Jangan tunggu",
+          "tags": "Indonesian protest ballad, emotional male vocal, slow dramatic pop Melayu rock, piano intro, acoustic guitar, cinematic strings, powerful chorus, sharp social criticism, satire about current government, justice for rakyat kecil, corruption, broken promises, reformasi spirit, melancholic verse, anthem chorus, serious poetic Indonesian lyrics.",
+          "duration": 288.64
+        },
+        {
+          "id": "fa23f6bc-14ba-43c3-86bd-c202418a8c59",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/170ef4dc-d566-4c02-b8fa-706c659e2b4e-1.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/170ef4dc-d566-4c02-b8fa-706c659e2b4e-1.jpeg",
+          "title": "Jangan tunggu",
+          "tags": "Indonesian protest ballad, emotional male vocal, slow dramatic pop Melayu rock, piano intro, acoustic guitar, cinematic strings, powerful chorus, sharp social criticism, satire about current government, justice for rakyat kecil, corruption, broken promises, reformasi spirit, melancholic verse, anthem chorus, serious poetic Indonesian lyrics.",
+          "duration": 307.96
+        }
+      ],
+      "error": null,
+      "liked": false,
+      "providerJobId": "170ef4dc-d566-4c02-b8fa-706c659e2b4e",
+      "providerKeyId": "53cbf249-63e5-4888-963a-a9f6a14da48a",
+      "createdAt": 1782100956097,
+      "updatedAt": 1782101142138,
+      "ownerId": "c_8719a06c-eb94-4705-8c72-072f2fffa219"
+    },
+    {
+      "id": "f27edca8-15d2-41de-a661-0d8bec212002",
+      "title": "Buruh tani",
+      "lyrics": "Buruh tani mahasiswa rakyat miskin kota\nBersatu padu rebut demokrasi\nGegap gempita dalam satu suara\nDemi tugas suci yang mulia\n\nHari-hari esok adalah milik kita\nTerciptanya masyarakat sejahtera\nTerbentuknya tatanan masyarakat\nIndonesia baru tanpa orba\n\nMarilah kawan mari kita kabarkan\nDi tangan kita tergenggam arah bangsa\nMarilah kawan mari kita nyanyikan\nSebuah lagu tentang pembebasan\n\nDi bawah kuasa tirani\nKususuri garis jalan ini\nBerjuta kali turun aksi\nBagiku satu langkah pasti",
+      "style": "Indonesian protest ballad, emotional male vocal, slow dramatic pop Melayu rock, piano intro, acoustic guitar, cinematic strings, powerful chorus, sharp social criticism, satire about current government, justice for rakyat kecil, corruption, broken promises, reformasi spirit, melancholic verse, anthem chorus, serious poetic Indonesian lyrics",
+      "type": "vocal",
+      "vocalGender": "auto",
+      "model": "V4_5PLUS",
+      "modelLabel": "sunoapi.org V4_5PLUS",
+      "credits": 11,
+      "status": "failed",
+      "audioUrl": null,
+      "imageUrl": null,
+      "tracks": [],
+      "error": "Your lyrics contain copyrighted material. Please change it and try again.",
+      "liked": false,
+      "provider": "uploadcover",
+      "providerJobId": "d54e9ea7113f01826132495292fcf5a0",
+      "providerKeyId": "9bd4d41d-afab-453e-94aa-8535ce5fa29e",
+      "isCover": true,
+      "isUpload": true,
+      "sourceFile": "Titik_jenuh.mp3",
+      "createdAt": 1782105479305,
+      "updatedAt": 1782105536589,
+      "ownerId": "c_8719a06c-eb94-4705-8c72-072f2fffa219"
+    },
+    {
+      "id": "39df2dfb-426b-4008-b986-4bd4edf32add",
+      "title": "Horeg",
+      "lyrics": "[Intro MC]\nArek-arek kabeh merapat\nLampu nyala, bass mulai menghentak\n\n[Verse]\nMalam panas di pinggir jalan\nRame-rame ikut goyang badan\nKendang masuk bikin lupa pulang\nBass horeg bikin dada bergetar\n\n[Pre-Chorus]\nNaikkan lagi, jangan pelan-pelan\nBiar sekampung ikut bergoyang\n\n[Chorus]\nHoreg horeg, bass-nya meledak\nKanan kiri semua bergerak\nHoreg horeg, malam menyala\nKoplo jalanan pecah suasana\n\n[Drop]\nJedag jedug horeg\nJedag jedug horeg\nBass turun, kendang masuk\nSemua goyang sampai subuh",
+      "style": "DJ dangdut koplo EDM, Indonesian sound horeg carnival style, massive deep sub bass, bass boosted, powerful kick drum, fast kendang koplo rhythm, breakbeat dangdut remix, hype MC shouts, crowd party atmosphere, siren riser, dramatic build up, explosive drop, street parade sound system vibe, energetic male vocal, catchy Indonesian hook, 145 BPM,carnival sound system”, “kendang koplo”, “breakbeat dangdut remix”, dan “MC shouts”.",
+      "type": "vocal",
+      "vocalGender": "auto",
+      "model": "suno-v5.5",
+      "modelLabel": "Suno V5.5",
+      "credits": 11,
+      "status": "success",
+      "audioUrl": "https://cdn2.apiframe.ai/audio/e30846b0-3256-4113-9799-75522a2bc52e-0.mp3",
+      "imageUrl": "https://cdn2.apiframe.ai/audio/e30846b0-3256-4113-9799-75522a2bc52e-0.jpeg",
+      "tracks": [
+        {
+          "id": "04e82c8b-165d-46b4-87e2-ba9abefe928a",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/e30846b0-3256-4113-9799-75522a2bc52e-0.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/e30846b0-3256-4113-9799-75522a2bc52e-0.jpeg",
+          "title": "Horeg",
+          "tags": "DJ dangdut koplo EDM, Indonesian sound horeg carnival style, massive deep sub bass, bass boosted, powerful kick drum, fast kendang koplo rhythm, breakbeat dangdut remix, hype MC shouts, crowd party atmosphere, siren riser, dramatic build up, explosive drop, street parade sound system vibe, energetic male vocal, catchy Indonesian hook, 145 BPM,carnival sound system”, “kendang koplo”, “breakbeat dangdut remix”, dan “MC shouts”.",
+          "duration": 127.56
+        },
+        {
+          "id": "caf4ea22-9bf3-487b-9f68-b0cf66e9c76d",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/e30846b0-3256-4113-9799-75522a2bc52e-1.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/e30846b0-3256-4113-9799-75522a2bc52e-1.jpeg",
+          "title": "Horeg",
+          "tags": "DJ dangdut koplo EDM, Indonesian sound horeg carnival style, massive deep sub bass, bass boosted, powerful kick drum, fast kendang koplo rhythm, breakbeat dangdut remix, hype MC shouts, crowd party atmosphere, siren riser, dramatic build up, explosive drop, street parade sound system vibe, energetic male vocal, catchy Indonesian hook, 145 BPM,carnival sound system”, “kendang koplo”, “breakbeat dangdut remix”, dan “MC shouts”.",
+          "duration": 93.2
+        }
+      ],
+      "error": null,
+      "liked": false,
+      "providerJobId": "e30846b0-3256-4113-9799-75522a2bc52e",
+      "providerKeyId": "5214e9af-2d7f-42ed-8160-dc38efda3967",
+      "createdAt": 1782473004496,
+      "updatedAt": 1782473125073,
+      "ownerId": "c_8719a06c-eb94-4705-8c72-072f2fffa219"
+    },
+    {
+      "id": "9c565d88-cccd-4a46-9485-f972fa2c35df",
+      "title": "Titik jenuh (Aransemen)",
+      "lyrics": "Verse 1\nJangan tunggu rakyat jenuh\nMenahan lapar, menahan pilu\nJangan tunggu suara kecil\nBerubah badai di jalan sunyi\nPre-Chorus\nSebab diam bukan berarti rela\nSenyum bukan tanda bahagia\nAda luka yang terus disimpan\nMenunggu waktu jadi perlawanan\nChorus\nJangan tunggu reformasi\nTeriak lagi di bumi ini\nSaat janji tak lagi dipercaya\nRakyat bangkit membawa nyata\nVerse 2\nKursi tinggi jangan terlena\nKeadilan jangan cuma cerita\nBila hukum tajam memilih\nKepercayaan akan tersisih\nChorus\nJangan tunggu reformasi\nTeriak lagi di bumi ini\nSaat sabar sampai batasnya\nPerubahan jadi kenyataan\nOutro\nNegerikuuuu…\nDengarlah sebelum terlambat\nSebab suara rakyat\nBisa menjadi sejarah.",
+      "style": "DJ dangdut koplo EDM, Indonesian sound horeg carnival style, massive deep sub bass, bass boosted, powerful kick drum, fast kendang koplo rhythm, breakbeat dangdut remix, hype MC shouts, crowd party atmosphere, siren riser, dramatic build up, explosive drop, street parade sound system vibe, energetic male vocal, catchy Indonesian hook, 145 BPM,carnival sound system”, “kendang koplo”, “breakbeat dangdut remix”, dan “MC shouts”.",
+      "type": "vocal",
+      "vocalGender": "auto",
+      "model": "suno-v5.5",
+      "modelLabel": "Suno V5.5",
+      "credits": 11,
+      "status": "success",
+      "audioUrl": "https://cdn2.apiframe.ai/audio/870b459d-58be-4540-b2f0-b3ca32f5690d-0.mp3",
+      "imageUrl": "https://cdn2.apiframe.ai/audio/870b459d-58be-4540-b2f0-b3ca32f5690d-0.jpeg",
+      "tracks": [
+        {
+          "id": "ceb36e94-62ac-450b-8661-a56237ded031",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/870b459d-58be-4540-b2f0-b3ca32f5690d-0.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/870b459d-58be-4540-b2f0-b3ca32f5690d-0.jpeg",
+          "title": "Titik jenuh",
+          "tags": "DJ dangdut koplo EDM, Indonesian sound horeg carnival style, massive deep sub bass, bass boosted, powerful kick drum, fast kendang koplo rhythm, breakbeat dangdut remix, hype MC shouts, crowd party atmosphere, siren riser, dramatic build up, explosive drop, street parade sound system vibe, energetic male vocal, catchy Indonesian hook, 145 BPM,carnival sound system”, “kendang koplo”, “breakbeat dangdut remix”, dan “MC shouts”.",
+          "duration": 261.76
+        },
+        {
+          "id": "7464401f-e4e2-42c4-8b11-1ea0c87201fb",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/870b459d-58be-4540-b2f0-b3ca32f5690d-1.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/870b459d-58be-4540-b2f0-b3ca32f5690d-1.jpeg",
+          "title": "Titik jenuh",
+          "tags": "DJ dangdut koplo EDM, Indonesian sound horeg carnival style, massive deep sub bass, bass boosted, powerful kick drum, fast kendang koplo rhythm, breakbeat dangdut remix, hype MC shouts, crowd party atmosphere, siren riser, dramatic build up, explosive drop, street parade sound system vibe, energetic male vocal, catchy Indonesian hook, 145 BPM,carnival sound system”, “kendang koplo”, “breakbeat dangdut remix”, dan “MC shouts”.",
+          "duration": 250.24
+        }
+      ],
+      "error": null,
+      "liked": false,
+      "providerJobId": "870b459d-58be-4540-b2f0-b3ca32f5690d",
+      "providerKeyId": "53cbf249-63e5-4888-963a-a9f6a14da48a",
+      "isCover": true,
+      "coverOf": "724e779b-59d9-434a-8c14-6ca95ba7dd9f",
+      "createdAt": 1782473101279,
+      "updatedAt": 1782473379445,
+      "ownerId": "c_8719a06c-eb94-4705-8c72-072f2fffa219"
+    },
+    {
+      "id": "fcf04791-de21-4fe3-ad0d-a72db6b6701b",
+      "title": "Horeg (Aransemen)",
+      "lyrics": "[Intro MC]\nArek-arek kabeh merapat\nLampu nyala, bass mulai menghentak\n\n[Verse]\nMalam panas di pinggir jalan\nRame-rame ikut goyang badan\nKendang masuk bikin lupa pulang\nBass horeg bikin dada bergetar\n\n[Pre-Chorus]\nNaikkan lagi, jangan pelan-pelan\nBiar sekampung ikut bergoyang\n\n[Chorus]\nHoreg horeg, bass-nya meledak\nKanan kiri semua bergerak\nHoreg horeg, malam menyala\nKoplo jalanan pecah suasana\n\n[Drop]\nJedag jedug horeg\nJedag jedug horeg\nBass turun, kendang masuk\nSemua goyang sampai subuh",
+      "style": "DJ clarity EDM, Indonesian sound horeg carnival style, massive deep sub bass, bass boosted, powerful kick drum, fast kendang koplo rhythm, breakbeat dangdut remix, hype MC shouts, crowd party atmosphere, siren riser, dramatic build up, explosive drop, street parade sound system vibe, energetic male vocal, catchy Indonesian hook, 145 BPM,carnival sound system”, “kendang koplo”, “clarity”, dan “MC shouts”.",
+      "type": "vocal",
+      "vocalGender": "auto",
+      "model": "suno-v5.5",
+      "modelLabel": "Suno V5.5",
+      "credits": 11,
+      "status": "success",
+      "audioUrl": "https://cdn2.apiframe.ai/audio/497e3f04-5e64-448e-b6fd-893300421229-0.mp3",
+      "imageUrl": "https://cdn2.apiframe.ai/audio/497e3f04-5e64-448e-b6fd-893300421229-0.jpeg",
+      "tracks": [
+        {
+          "id": "2bafb40e-3f07-4b31-b846-1b241d1a9ce6",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/497e3f04-5e64-448e-b6fd-893300421229-0.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/497e3f04-5e64-448e-b6fd-893300421229-0.jpeg",
+          "title": "Horeg",
+          "tags": "DJ clarity EDM, Indonesian sound horeg carnival style, massive deep sub bass, bass boosted, powerful kick drum, fast kendang koplo rhythm, breakbeat dangdut remix, hype MC shouts, crowd party atmosphere, siren riser, dramatic build up, explosive drop, street parade sound system vibe, energetic male vocal, catchy Indonesian hook, 145 BPM,carnival sound system”, “kendang koplo”, “clarity”, dan “MC shouts”.",
+          "duration": 144.4
+        },
+        {
+          "id": "62f9ccdc-040a-49f5-877b-d002e88c3cb2",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/497e3f04-5e64-448e-b6fd-893300421229-1.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/497e3f04-5e64-448e-b6fd-893300421229-1.jpeg",
+          "title": "Horeg",
+          "tags": "DJ clarity EDM, Indonesian sound horeg carnival style, massive deep sub bass, bass boosted, powerful kick drum, fast kendang koplo rhythm, breakbeat dangdut remix, hype MC shouts, crowd party atmosphere, siren riser, dramatic build up, explosive drop, street parade sound system vibe, energetic male vocal, catchy Indonesian hook, 145 BPM,carnival sound system”, “kendang koplo”, “clarity”, dan “MC shouts”.",
+          "duration": 127.56
+        }
+      ],
+      "error": null,
+      "liked": false,
+      "providerJobId": "497e3f04-5e64-448e-b6fd-893300421229",
+      "providerKeyId": "5214e9af-2d7f-42ed-8160-dc38efda3967",
+      "isCover": true,
+      "coverOf": "39df2dfb-426b-4008-b986-4bd4edf32add",
+      "createdAt": 1782473374916,
+      "updatedAt": 1782473565918,
+      "ownerId": "c_8719a06c-eb94-4705-8c72-072f2fffa219"
+    },
+    {
+      "id": "04ddb277-324c-459b-af55-101c2a94a0ef",
+      "title": "Masih Ada Kamu",
+      "lyrics": "[Verse 1]\nLampu teras masih kau nyalakan\nSaat pulangku lebih larut dari biasa\nKau geser cangkir ke dekat tanganku\nBiar hangatnya menjawab lelahku\n\n[Verse 2]\nAda hari kita saling terdiam\nMenyimpan kata yang tak jadi terucap\nTapi sebelum malam memejam\nKau mendekat, menggenggamku erat\n\n[Pre-Chorus]\nTak selalu mudah jalan yang kita pilih\nNamun kau tetap di sini\n\n[Chorus]\nMasih ada kamu di ujung hariku\nTempat segala lelah boleh jatuh\nBila dunia tak mau mendengarkanku\nKau duduk di samping, menunggu\n\nMasih ada kamu, masih ingin aku\nMenjalani pagi yang belum tentu\nBukan karena kita tak pernah terluka\nKita belajar tinggal, saling menjaga\n\n[Verse 3]\nFoto lama di sudut meja\nSenyum kita sebelum banyak cerita\nKini ada garis di wajahmu\nDan makin banyak alasanku memilihmu\n\n[Pre-Chorus]\nTak selalu sama mimpi yang kita punya\nNamun kita bicara\n\n[Chorus]\nMasih ada kamu di ujung hariku\nTempat segala lelah boleh jatuh\nBila dunia tak mau mendengarkanku\nKau duduk di samping, menunggu\n\nMasih ada kamu, masih ingin aku\nMenjalani pagi yang belum tentu\nBukan karena kita tak pernah terluka\nKita belajar tinggal, saling menjaga\n\n[Bridge]\nKalau nanti langkahku melambat\nJangan jauh, berjalanlah dekat\nBiar kubawa separuh bebanmu\nSeperti kau membawa lelahku\n\n[Final Chorus]\nMasih ada kamu di ujung hariku\nRumah yang kutemukan dalam pelukmu\nBila esok tak seperti yang kita mau\nKita mulai lagi, aku dan kamu\n\nMasih ada kamu, masih ingin aku\nMenjadi alasan tenang di hatimu\nBukan karena kita tak pernah terluka\nKita belajar tinggal, saling menjaga\n\n[Outro]\nLampu teras pelan kupadamkan\nKau di sisiku\nCukup, untuk malam ini",
+      "style": "Indonesian romantic acoustic pop, 82 BPM. Warm intimate male vocal with a slightly raspy texture, natural breaths, restrained vibrato, heartfelt conversational phrasing. Fingerpicked acoustic guitar, soft piano, warm bass, gentle live drums, subtle strings building in the final chorus. Memorable melodic chorus, tender verses, emotional bridge, hopeful ending. Organic dynamics, clear Indonesian pronunciation, polished warm mix.",
+      "type": "vocal",
+      "vocalGender": "male",
+      "model": "suno-v5.5",
+      "modelLabel": "Suno V5.5",
+      "credits": 11,
+      "status": "success",
+      "audioUrl": "https://cdn2.apiframe.ai/audio/6a4833e3-6dc9-4638-a095-093d41d8a897-0.mp3",
+      "imageUrl": "https://cdn2.apiframe.ai/audio/6a4833e3-6dc9-4638-a095-093d41d8a897-0.jpeg",
+      "tracks": [
+        {
+          "id": "5e53114a-f895-45c1-b0f5-d40f1058449d",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/6a4833e3-6dc9-4638-a095-093d41d8a897-0.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/6a4833e3-6dc9-4638-a095-093d41d8a897-0.jpeg",
+          "title": "Masih Ada Kamu",
+          "tags": "Indonesian romantic acoustic pop, 82 BPM. Warm intimate male vocal with a slightly raspy texture, natural breaths, restrained vibrato, heartfelt conversational phrasing. Fingerpicked acoustic guitar, soft piano, warm bass, gentle live drums, subtle strings building in the final chorus. Memorable melodic chorus, tender verses, emotional bridge, hopeful ending. Organic dynamics, clear Indonesian pronunciation, polished warm mix.",
+          "duration": 318.08
+        },
+        {
+          "id": "b2ac883b-5a7e-4b0e-b00b-a6508408cc14",
+          "audioUrl": "https://cdn2.apiframe.ai/audio/6a4833e3-6dc9-4638-a095-093d41d8a897-1.mp3",
+          "imageUrl": "https://cdn2.apiframe.ai/audio/6a4833e3-6dc9-4638-a095-093d41d8a897-1.jpeg",
+          "title": "Masih Ada Kamu",
+          "tags": "Indonesian romantic acoustic pop, 82 BPM. Warm intimate male vocal with a slightly raspy texture, natural breaths, restrained vibrato, heartfelt conversational phrasing. Fingerpicked acoustic guitar, soft piano, warm bass, gentle live drums, subtle strings building in the final chorus. Memorable melodic chorus, tender verses, emotional bridge, hopeful ending. Organic dynamics, clear Indonesian pronunciation, polished warm mix.",
+          "duration": 335.48
+        }
+      ],
+      "error": null,
+      "liked": false,
+      "provider": "apiframe",
+      "providerJobId": "6a4833e3-6dc9-4638-a095-093d41d8a897",
+      "providerKeyId": "5214e9af-2d7f-42ed-8160-dc38efda3967",
+      "createdAt": 1788685913422,
+      "updatedAt": 1788686331428,
+      "ownerId": "c_8719a06c-eb94-4705-8c72-072f2fffa219",
+      "errorCode": null
+    },
+    {
+      "id": "6c26bf21-2fc1-45f1-9958-6d58b0d7b2ea",
+      "title": "Ipank_-_Mutiara_(mp3.pm) (Aransemen)",
+      "lyrics": "",
+      "style": "Pop akustik hangat, gitar akustik, piano lembut, bass halus, perkusi ringan, vokal ekspresif, aransemen bersih.",
+      "type": "vocal",
+      "vocalGender": "auto",
+      "model": "V4_5PLUS",
+      "modelLabel": "KIE Cover V4_5PLUS",
+      "credits": 11,
+      "status": "failed",
+      "audioUrl": null,
+      "imageUrl": null,
+      "tracks": [],
+      "error": "This audio matches an existing recording in our catalog.",
+      "liked": false,
+      "provider": "kie",
+      "providerJobId": "183028e3db76c6bef962739cb93e67c9",
+      "providerKeyId": "2cc59794-1009-4ff2-a835-e48108b86c35",
+      "isCover": true,
+      "isUpload": true,
+      "sourceFile": "Ipank_-_Mutiara_(mp3.pm).mp3",
+      "uploadUrl": "https://tempfile.redpandaai.co/kieai/11781446/audio/pbmstudio/dbfd059d-6905-4656-a096-77e013c4164b.mp3",
+      "negativeTags": null,
+      "audioWeight": null,
+      "createdAt": 1788965872016,
+      "updatedAt": 1788965921316,
+      "ownerId": "c_19291930-4ffc-4f52-a8b1-bda37c53d52b",
+      "errorCode": null
+    },
+    {
+      "id": "7844bed6-08de-4ef6-902a-110fe33df586",
+      "title": "Ready for the Day",
+      "lyrics": "[Instrumental Intro: groovy electric bass, bright brass stabs, shaker]\n\n[Verse 1]\nThe alarm went off, I let it ring\nThen got up before the second ding\nThere's a shirt I like behind the chair\nA little wrinkled, I don't care\nYesterday I lost my nerve\nHad a few things not quite work\nBut the kettle's on, my shoes are tied\nI'm taking one more step outside\n\n[Pre-Chorus]\nI don't need to have it figured out\nTo get my feet back on the ground\nTake a breath and turn the key\nThere's a whole day waiting for me\n\n[Chorus]\nI'm ready for the day\nLet a little sunshine hit my face\nI've got a heart that won't give up\nAnd a friend who says, you've got this, love\nI'm ready for the day\nEven if a few things go astray\nOne good step, then another one\nHere I come, here I come\n\n[Verse 2]\nAt the corner someone's singing\nOff-key, but I like the feeling\nBuy a coffee, call my friend\nShe says, tell me how it went\nI say, ask me when it's over\nRight now I'm a little bolder\nI've been waiting for a perfect sign\nMaybe showing up will do just fine\n\n[Pre-Chorus]\nI don't need to have it figured out\nTo get my feet back on the ground\nTake a breath and turn the key\nThere's a whole day waiting for me\n\n[Chorus]\nI'm ready for the day\nLet a little sunshine hit my face\nI've got a heart that won't give up\nAnd a friend who says, you've got this, love\nI'm ready for the day\nEven if a few things go astray\nOne good step, then another one\nHere I come, here I come\n\n[Instrumental Drop: joyful brass motif over melodic house groove]\n\n[Bridge: intimate, breathing room]\nSome mornings I still hesitate\nStand by the door and make you wait\nYou squeeze my hand, I laugh a little\nI can start right in the middle\nNot every try will turn to gold\nBut there's a story left untold\nAnd I want to see where this one goes\n\n[Final Chorus: joyful, expressive]\nI'm ready for the day\nLet a little sunshine hit my face\nI've got a heart that won't give up\nAnd a friend who says, you've got this, love\nI'm ready for the day\nEven if a few things go astray\nOne good step, then another one\nHere I come, here I come\n\n[Outro]\nOne good step, then another one\nI'm ready for the day\n[Brass and bass outro]",
+      "style": "English dance-pop / melodic house, 122 BPM, bright major key, energetic optimistic mood. Warm intimate slightly husky female mezzo-soprano, airy verses, rounded midrange, smooth head voice; preserve previous vocal direction. Human expressive singing: audible gentle breaths, meaning-led pauses, varied word stress and dynamics, subtle behind-the-beat phrasing, light end-phrase vibrato, occasional natural rasp, conversational verses growing into joyful chorus. No robotic timing, hard tuning, excessive melisma or shrill belting. New 8-second instrumental intro: groovy fingerstyle electric bass riff, answered by bright brass stabs, shaker joining gradually. No piano, guitar or marimba-led opening. Four-on-the-floor kick, warm bass, shimmering synths, uplifting singalong hook within 25 seconds, melodic drop reprising brass motif. Around 3 minutes, upfront clear vocal, spacious stereo, balanced bass, natural production.",
+      "type": "vocal",
+      "vocalGender": "female",
+      "personaRef": null,
+      "model": "kie-suno-v5.5",
+      "modelLabel": "KIE AI Suno V5.5",
+      "credits": 11,
+      "status": "success",
+      "audioUrl": "https://tempfile.aiquickdraw.com/r/b6abbecc-90b7-4bc8-ba58-220a0d586cf1.mp3",
+      "imageUrl": "https://musicfile.kie.ai/YjZhYmJlY2MtOTBiNy00YmM4LWJhNTgtMjIwYTBkNTg2Y2Yx.jpeg",
+      "tracks": [
+        {
+          "id": "b6abbecc-90b7-4bc8-ba58-220a0d586cf1",
+          "audioUrl": "https://tempfile.aiquickdraw.com/r/b6abbecc-90b7-4bc8-ba58-220a0d586cf1.mp3",
+          "imageUrl": "https://musicfile.kie.ai/YjZhYmJlY2MtOTBiNy00YmM4LWJhNTgtMjIwYTBkNTg2Y2Yx.jpeg",
+          "title": "Ready for the Day",
+          "tags": "English dance-pop / melodic house, 122 BPM, bright major key, energetic optimistic mood. Warm intimate slightly husky female mezzo-soprano, airy verses, rounded midrange, smooth head voice; preserve previous vocal direction. Human expressive singing: audible gentle breaths, meaning-led pauses, varied word stress and dynamics, subtle behind-the-beat phrasing, light end-phrase vibrato, occasional natural rasp, conversational verses growing into joyful chorus. No robotic timing, hard tuning, excessive melisma or shrill belting. New 8-second instrumental intro: groovy fingerstyle electric bass riff, answered by bright brass stabs, shaker joining gradually. No piano, guitar or marimba-led opening. Four-on-the-floor kick, warm bass, shimmering synths, uplifting singalong hook within 25 seconds, melodic drop reprising brass motif. Around 3 minutes, upfront clear vocal, spacious stereo, balanced bass, natural production.",
+          "duration": 233.16
+        },
+        {
+          "id": "8d63a548-fab4-42de-9504-69d0d24b4d93",
+          "audioUrl": "https://tempfile.aiquickdraw.com/r/8d63a548-fab4-42de-9504-69d0d24b4d93.mp3",
+          "imageUrl": "https://musicfile.kie.ai/OGQ2M2E1NDgtZmFiNC00MmRlLTk1MDQtNjlkMGQyNGI0ZDkz.jpeg",
+          "title": "Ready for the Day",
+          "tags": "English dance-pop / melodic house, 122 BPM, bright major key, energetic optimistic mood. Warm intimate slightly husky female mezzo-soprano, airy verses, rounded midrange, smooth head voice; preserve previous vocal direction. Human expressive singing: audible gentle breaths, meaning-led pauses, varied word stress and dynamics, subtle behind-the-beat phrasing, light end-phrase vibrato, occasional natural rasp, conversational verses growing into joyful chorus. No robotic timing, hard tuning, excessive melisma or shrill belting. New 8-second instrumental intro: groovy fingerstyle electric bass riff, answered by bright brass stabs, shaker joining gradually. No piano, guitar or marimba-led opening. Four-on-the-floor kick, warm bass, shimmering synths, uplifting singalong hook within 25 seconds, melodic drop reprising brass motif. Around 3 minutes, upfront clear vocal, spacious stereo, balanced bass, natural production.",
+          "duration": 262.4
+        }
+      ],
+      "error": null,
+      "liked": false,
+      "provider": "kie",
+      "providerJobId": "299a24ff4b484a27048a1bec0c264938",
+      "providerKeyId": "e6c74f1e-9712-4dfa-b6e8-9abd97ebc800",
+      "createdAt": 1790831496068,
+      "updatedAt": 1790831534122,
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f"
+    },
+    {
+      "id": "b7956cb0-29af-42a5-9228-fc5e9514f23c",
+      "title": "Crown of Ashes",
+      "lyrics": "[Intro: low cello pulse, distant French horn, unfolding strings]\n\n[Verse 1: intimate low baritone]\nI found my father's coat downstairs\nStill hanging where he left it\nI put it on to face the cold\nAnd stood there for a second\nThe house was quiet as a church\nThe clock kept counting through it\nI had a thousand things to say\nAnd no one left to say them to\n\n[Pre-Chorus: tension rising]\nI cannot bring the old days back\nOr make these walls forget\nBut I can turn the handle\nWith the strength that I have left\n\n[Chorus: towering orchestra, expressive falsetto hook]\nI won't wear a crown of ashes\nI won't make a throne of pain\nLet the wind take what it carries\nI am stepping out again\nI can grieve and still keep going\nI can fall and still stand tall\nI won't wear a crown of ashes\nThere's a life beyond these walls\n\n[Verse 2: restrained dark-pop pulse]\nThe street was busy, bright and strange\nA child ran past me laughing\nI almost turned around for home\nThen heard my brother asking\nAre you coming by tonight?\nWe saved a place beside us\nI said I'd try, then crossed the road\nBefore the fear could find me\n\n[Pre-Chorus: brass and percussion build]\nI cannot bring the old days back\nBut I can keep their kindness\nA place for someone at my table\nA lamp left on in darkness\n\n[Chorus: full strings, brass, taiko]\nI won't wear a crown of ashes\nI won't make a throne of pain\nLet the wind take what it carries\nI am stepping out again\nI can grieve and still keep going\nI can fall and still stand tall\nI won't wear a crown of ashes\nThere's a life beyond these walls\n\n[Instrumental: sweeping string ostinato, French horns, taiko and timpani]\n\n[Bridge: stripped back, breath and natural rasp]\nSome nights I still reach for the phone\nTo tell you something small\nAnd when I hear your words in mine\nI haven't lost it all\nYou taught me how to mend a chair\nAnd how to ask for help\nToday I let my brother in\nInstead of blaming myself\n\n[Final Chorus: immense, soaring falsetto on title]\nI won't wear a crown of ashes\nI won't make a throne of pain\nLet the wind take what it carries\nI am stepping out again\nI can grieve and still keep going\nI can fall and still stand tall\nI won't wear a crown of ashes\nThere's a life beyond these walls\n\n[Outro: powerful orchestra, warm low vocal]\nI'll leave a lamp on in the hall\nThere's a life beyond these walls\n[Extended orchestral resolution: brass, timpani, lingering low strings]",
+      "style": "Epic orchestral cinematic, sweeping string ostinato and broad legato violins, bold French horns and low brass, deep orchestral percussion with driving taiko and timpani, retain a dark-pop pulse through restrained synth bass and modern kick, intimate low male lead rising into expressive falsetto on the hooks, dramatic builds from sparse verse to towering chorus, wide polished film-score mix with clear vocal center and powerful final outro. Original English song, dark minor key, 88 BPM, around 3:30. Distinctive warm gritty baritone, textured husky rasp, resonant chest voice, natural breath and slight vocal cracks, emotionally varied phrasing, light vibrato. Falsetto retains an airy human texture; no screaming, robotic tuning or harsh distortion. Intro: low cello pulse and distant horn, then strings unfold. Defiant renewal after personal loss. Quiet bridge before immense final chorus, orchestral outro resolving with lingering low strings.",
+      "type": "vocal",
+      "vocalGender": "male",
+      "personaRef": null,
+      "model": "kie-suno-v5.5",
+      "modelLabel": "KIE AI Suno V5.5",
+      "credits": 11,
+      "status": "success",
+      "audioUrl": "https://audiostream.kie.ai/stream/99ccfbdb-ce20-49fe-8f83-591b2a7dafff.mp3",
+      "imageUrl": "https://musicfile.kie.ai/OTljY2ZiZGItY2UyMC00OWZlLThmODMtNTkxYjJhN2RhZmZm.jpeg",
+      "tracks": [
+        {
+          "id": "99ccfbdb-ce20-49fe-8f83-591b2a7dafff",
+          "audioUrl": "https://audiostream.kie.ai/stream/99ccfbdb-ce20-49fe-8f83-591b2a7dafff.mp3",
+          "imageUrl": "https://musicfile.kie.ai/OTljY2ZiZGItY2UyMC00OWZlLThmODMtNTkxYjJhN2RhZmZm.jpeg",
+          "title": "Crown of Ashes",
+          "tags": "Epic orchestral cinematic, sweeping string ostinato and broad legato violins, bold French horns and low brass, deep orchestral percussion with driving taiko and timpani, retain a dark-pop pulse through restrained synth bass and modern kick, intimate low male lead rising into expressive falsetto on the hooks, dramatic builds from sparse verse to towering chorus, wide polished film-score mix with clear vocal center and powerful final outro. Original English song, dark minor key, 88 BPM, around 3:30. Distinctive warm gritty baritone, textured husky rasp, resonant chest voice, natural breath and slight vocal cracks, emotionally varied phrasing, light vibrato. Falsetto retains an airy human texture; no screaming, robotic tuning or harsh distortion. Intro: low cello pulse and distant horn, then strings unfold. Defiant renewal after personal loss. Quiet bridge before immense final chorus, orchestral outro resolving with lingering low strings."
+        },
+        {
+          "id": "59932e21-ba6a-4cf2-850f-372a9fc1eb84",
+          "audioUrl": "https://audiostream.kie.ai/stream/59932e21-ba6a-4cf2-850f-372a9fc1eb84.mp3",
+          "imageUrl": "https://musicfile.kie.ai/NTk5MzJlMjEtYmE2YS00Y2YyLTg1MGYtMzcyYTlmYzFlYjg0.jpeg",
+          "title": "Crown of Ashes",
+          "tags": "Epic orchestral cinematic, sweeping string ostinato and broad legato violins, bold French horns and low brass, deep orchestral percussion with driving taiko and timpani, retain a dark-pop pulse through restrained synth bass and modern kick, intimate low male lead rising into expressive falsetto on the hooks, dramatic builds from sparse verse to towering chorus, wide polished film-score mix with clear vocal center and powerful final outro. Original English song, dark minor key, 88 BPM, around 3:30. Distinctive warm gritty baritone, textured husky rasp, resonant chest voice, natural breath and slight vocal cracks, emotionally varied phrasing, light vibrato. Falsetto retains an airy human texture; no screaming, robotic tuning or harsh distortion. Intro: low cello pulse and distant horn, then strings unfold. Defiant renewal after personal loss. Quiet bridge before immense final chorus, orchestral outro resolving with lingering low strings."
+        }
+      ],
+      "error": null,
+      "liked": false,
+      "provider": "kie",
+      "providerJobId": "337eb5de083b4cc75173d7b8d866921e",
+      "providerKeyId": "927c9c61-5d8c-4299-8aac-0ab7b337b245",
+      "createdAt": 1790874122931,
+      "updatedAt": 1790874141360,
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f"
+    }
+  ],
+  "frontpage": {
+    "title": "Setiap cerita layak menjadi lagu.",
+    "subtitle": "Ciptakan suara. Sampaikan rasa.",
+    "tagline": "",
+    "description": "Satu ruang untuk menulis lirik, membuat lagu dengan AI, mengolah cover, dan menyempurnakan hasil karya. Mulai dari ide kecil Anda hari ini.",
+    "features": [
+      {
+        "icon": "🎵",
+        "text": "Generate lagu dari judul + gaya + lirik"
+      },
+      {
+        "icon": "🎹",
+        "text": "Aransemen ulang (cover) dengan gaya baru"
+      },
+      {
+        "icon": "🎼",
+        "text": "Pisah stem vokal & instrumen"
+      },
+      {
+        "icon": "✍️",
+        "text": "Tulis lirik otomatis pakai Gemini"
+      }
+    ],
+    "cta": "Mulai Buat Lagu ↗",
+    "footer": "by Bangalimin",
+    "blocks": []
+  },
+  "creditsApiframe": 390,
+  "creditsSuno": 500,
+  "apiKeys": [
+    {
+      "id": "7678c7a5-412a-48f2-8c80-c8cb27b0ae07",
+      "key": "afk_44890a8eb31eea22f3ccb744c53b8886fb2cc395",
+      "credits": 50,
+      "addedAt": 1781873930585,
+      "lastCheckedAt": 1781873938755
+    },
+    {
+      "id": "d521e5c2-01a7-4cbc-8560-7ba8921f3904",
+      "key": "afk_a03e1e06205acc522af4cb4e675a9ff336e69afd",
+      "credits": 50,
+      "addedAt": 1781874021438,
+      "lastCheckedAt": 1781874026709
+    },
+    {
+      "id": "4c8d4bd9-4148-4896-ae51-9e008358c49b",
+      "key": "afk_fe37e0e84fbec5873379b3010399c98f661579fe",
+      "credits": 39,
+      "addedAt": 1781876927328,
+      "lastCheckedAt": 1781876934051,
+      "ownerId": "c_9b492e7a-38c9-4222-a198-8684638bc18b"
+    },
+    {
+      "id": "bac3d46d-7d6a-4ab9-b311-771768a4c98f",
+      "key": "afk_1411b90e57bc763e2ab3e84494d7055139524357",
+      "credits": 50,
+      "addedAt": 1781877131479,
+      "lastCheckedAt": 1781877140302,
+      "ownerId": "c_9b492e7a-38c9-4222-a198-8684638bc18b"
+    },
+    {
+      "id": "5214e9af-2d7f-42ed-8160-dc38efda3967",
+      "ownerId": "c_8719a06c-eb94-4705-8c72-072f2fffa219",
+      "key": "afk_1411b90e57bc763e2ab3e84494d7055139524357",
+      "credits": 0,
+      "addedAt": 1781878882644,
+      "lastCheckedAt": 1789046518231
+    },
+    {
+      "id": "a484840b-4d02-493a-b671-6a37e815f488",
+      "ownerId": "c_644555cf-90b7-45e0-aba3-feecdf1f4993",
+      "key": "afk_abd3bcd5d075085b0c635ab44d564eed25f4964b",
+      "credits": 0,
+      "addedAt": 1784884202735,
+      "lastCheckedAt": 1784884264063
+    },
+    {
+      "id": "1bd8cd74-235a-47b5-b79b-66382522a6b1",
+      "ownerId": "c_644555cf-90b7-45e0-aba3-feecdf1f4993",
+      "key": "sk-0566325d25074aaa8d4152cd7a780e6b",
+      "credits": 0,
+      "addedAt": 1784884479483,
+      "lastCheckedAt": 1784884494642
+    }
+  ],
+  "keyCursor": 0,
+  "uploadKeys": [
+    {
+      "id": "9bd4d41d-afab-453e-94aa-8535ce5fa29e",
+      "key": "2e4d2f17c59147ec4e4e55e509d12a6f",
+      "credits": 50,
+      "addedAt": 1781864569464,
+      "lastCheckedAt": 1782481861969,
+      "ownerId": "c_8719a06c-eb94-4705-8c72-072f2fffa219"
+    },
+    {
+      "id": "8260b24d-6fb9-41fa-89a7-e224dd422225",
+      "key": "83231607ec7c6f4a3606aa2d763f6bc8",
+      "credits": 50,
+      "addedAt": 1781874086232,
+      "lastCheckedAt": 1781874091034
+    },
+    {
+      "id": "41b6299d-a8d1-4592-a915-fd8a3cc8a490",
+      "ownerId": "c_ab3430a5-2c1e-4b19-a2fd-3c1131013af5",
+      "key": "8ae7023620c1c56cf4f9c6aac4423bb5",
+      "credits": 50,
+      "addedAt": 1784100723642,
+      "lastCheckedAt": 1788445121207
+    },
+    {
+      "id": "e83d1283-fbca-43a5-aed8-23fb1db6eae0",
+      "ownerId": "c_dd23a117-d27c-4ff4-aa77-a423af009fb7",
+      "key": "069f273438979de2407d80a9cda652dd",
+      "credits": 0,
+      "addedAt": 1791047919015,
+      "lastCheckedAt": 1791047922097
+    }
+  ],
+  "uploadKeyCursor": 0,
+  "geminiKeys": [
+    {
+      "id": "efa492dc-7e82-4474-aaa4-8560ced8b49e",
+      "key": "AIzaSyBKvlInObc_2tQvZeQFEuVA7uQDm6cGt3I",
+      "credits": 1,
+      "addedAt": 1781864591249,
+      "lastCheckedAt": 1789045423081,
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f"
+    }
+  ],
+  "geminiKeyCursor": 0,
+  "userCredits": {
+    "guest": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_2ed943a3-17b5-4da2-93d2-46fea7e5be2e": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_9b492e7a-38c9-4222-a198-8684638bc18b": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "0b6b3851-2503-4922-8be9-f399fb012839": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_1ff07303-f540-45ae-a11b-55b53c77f6c8": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_c1517e83-e97b-44cc-b4da-29d350e186a2": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_989ab15b-5d23-44f6-b437-f16fdf6a7efb": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_54afac8e-65fe-47b5-9646-8c4875bf387e": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_8719a06c-eb94-4705-8c72-072f2fffa219": {
+      "creditsApiframe": 423,
+      "creditsSuno": 478
+    },
+    "c_9554a450-fe92-4436-b4c6-233acf5f5882": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_85672dba-38e8-421d-b49f-7c80bd702c8e": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_1f8d5303-a707-47b7-84d7-2c2778925261": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f": {
+      "creditsApiframe": 5,
+      "creditsSuno": 379
+    },
+    "c_ab3430a5-2c1e-4b19-a2fd-3c1131013af5": {
+      "creditsApiframe": 467,
+      "creditsSuno": 500
+    },
+    "c_959d4f53-86fb-4322-bb60-bbdbfb095046": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_7514272f-698c-4599-9877-15fba97e2ae7": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_d5fd35e9-b4d0-439a-b679-64d3b9cd2e62": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_67abdcab-d049-4990-9daa-74b8548cc7a3": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_0859b619-3af6-4462-a066-f07e25f00d00": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_7bac5cf0-1c86-461a-8265-173ff4024373": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_ae14c4e0-162e-4eee-92d2-71f86fd2f6e7": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_644555cf-90b7-45e0-aba3-feecdf1f4993": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_fd0ef7fe-0491-43bf-a12f-3b9001b39315": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_680d140b-56b8-4efd-b9df-6d9f8f000dc4": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_aa870747-ab29-469f-8f7d-ae57bcf3c7fc": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_e7ad1b7f-af1e-42fe-a163-fc249b58d73c": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_d34e64ff-4c67-48b3-8596-f72b11182dd3": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_570a47c4-1451-4e6a-8de6-a509098b27b9": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_9d3a6df2-97d1-42a8-97ce-bbb20bbdfc06": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_26e08085-6ef5-4ec0-913e-2ed4e0e012a1": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_b71815eb-8ff3-4dcd-9ce8-3a3653761ac8": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_dd23a117-d27c-4ff4-aa77-a423af009fb7": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_c8550089-42d9-45ec-adec-188afc22dd5c": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_a0253142-0296-472b-b977-8b1b42b5313c": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_68183ce7-2a71-47bf-bc09-9ea832e432a7": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_18f3cacf-c232-4aef-8e57-60f1360d8b40": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_55416662-c218-49f4-8c4d-9cd78ff1c084": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_fabd71c8-ef5d-48cd-9d5e-8bf53c0ffd2e": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_abd3d0d3-6221-4826-804d-734612e68e71": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_a7848482-8111-4f53-8ba1-4f0a27e0901e": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_5be34296-cdc7-4d64-8b17-f45e00af9006": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_6c6513d5-cce2-4d7e-a449-44c2989cb7dd": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_34921af8-f7fa-48c4-ba28-9b585236426a": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_f59787bf-9082-4b0f-b6cd-1a964802d971": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_4569b7dc-9307-4e8e-b22a-96128959efa7": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_17d2ba87-cf8c-472f-97fe-86906ec26de0": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_ce809d9a-851a-48d3-93c3-a8fab48c4daf": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_9fce3ef0-39d2-4537-b553-65221df41292": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_ee7f5640-4d0c-41e3-84dc-4656665cf6ac": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_4a4222bf-581c-415a-9d9d-1246a64e8912": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_dcd0fbe0-8e5c-46ca-b9fa-04d76addbcaf": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_bac427d3-1b64-4d44-b702-8a2e69813691": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_148d0b39-5754-4aa8-8107-ea170ae7c0d7": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_14afdead-1dd9-43a0-8af1-d9005c8e9cb9": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_2203f682-425b-4166-814a-036988ee978a": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    },
+    "c_19291930-4ffc-4f52-a8b1-bda37c53d52b": {
+      "creditsApiframe": 500,
+      "creditsSuno": 500
+    }
+  },
+  "cursors": {
+    "keyCursor:c_8719a06c-eb94-4705-8c72-072f2fffa219": 0,
+    "uploadKeyCursor:c_8719a06c-eb94-4705-8c72-072f2fffa219": 0,
+    "uploadKeyCursor:c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f": 1,
+    "keyCursor:c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f": 4,
+    "geminiKeyCursor:c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f": 0,
+    "kieKeyCursor:c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f": 9,
+    "kieKeyCursor:c_ab3430a5-2c1e-4b19-a2fd-3c1131013af5": 0,
+    "musicapiKeyCursor:c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f": 0,
+    "kieKeyCursor:c_19291930-4ffc-4f52-a8b1-bda37c53d52b": 0
+  },
+  "kieKeys": [
+    {
+      "id": "5b8e5f24-0c2a-411c-8fe5-50689ce9ba86",
+      "ownerId": "c_c1517e83-e97b-44cc-b4da-29d350e186a2",
+      "key": "6d2a880be4c2d9a37f53551b7678acd1",
+      "credits": null,
+      "addedAt": 1782482001347,
+      "lastCheckedAt": 1782482047056
+    },
+    {
+      "id": "76682f8e-bb5d-41fa-b36e-b75729b2bb6f",
+      "ownerId": "c_ab3430a5-2c1e-4b19-a2fd-3c1131013af5",
+      "key": "5341310a6cf78af6bbe07e3869387d32",
+      "credits": 44,
+      "addedAt": 1784098621481,
+      "lastCheckedAt": 1788877151986
+    },
+    {
+      "id": "771ad8d1-2c0f-47ba-a989-3eafedb3db65",
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f",
+      "key": "c932ae2cb84d45634cf4f213acd2e12e",
+      "credits": 19.6,
+      "addedAt": 1787671867517,
+      "lastCheckedAt": 1791044493291
+    },
+    {
+      "id": "5a511fc7-3cad-446a-96df-9473de377efd",
+      "ownerId": "c_14afdead-1dd9-43a0-8af1-d9005c8e9cb9",
+      "key": "7d18eb8b86a490f099650fa56fdd3dcf",
+      "credits": null,
+      "addedAt": 1788447633942,
+      "lastCheckedAt": 1788447814910
+    },
+    {
+      "id": "21ea9312-0a18-4b39-8d6b-6d7e1a6280b3",
+      "ownerId": "c_2203f682-425b-4166-814a-036988ee978a",
+      "key": "7d18eb8b86a490f099650fa56fdd3dcf",
+      "credits": null,
+      "addedAt": 1788520913285,
+      "lastCheckedAt": 1788521114889
+    },
+    {
+      "id": "53ab0578-f4fa-466b-b5f5-83f6c2454ce6",
+      "ownerId": "c_2203f682-425b-4166-814a-036988ee978a",
+      "key": "c932ae2cb84d45634cf4f213acd2e12e",
+      "credits": null,
+      "addedAt": 1788520944828,
+      "lastCheckedAt": 1788521093194
+    },
+    {
+      "id": "eeef07fc-3a0a-407e-9a00-5fb5d36bf64f",
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f",
+      "key": "d80da54a4d4edd048fe94ecdb36cd3f0",
+      "credits": 56,
+      "addedAt": 1788530494069,
+      "lastCheckedAt": 1791044496563
+    },
+    {
+      "id": "c31b0b54-7881-401e-8fd9-4f651dd0eacf",
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f",
+      "key": "7d18eb8b86a490f099650fa56fdd3dcf",
+      "credits": 56,
+      "addedAt": 1788545996014,
+      "lastCheckedAt": 1791044566136
+    },
+    {
+      "id": "c2c87ea5-f7f7-4267-90fd-53dd69a4d9eb",
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f",
+      "key": "4a1078c24241254b31ad2da0a8947e83",
+      "credits": 56,
+      "addedAt": 1788546024555,
+      "lastCheckedAt": 1791044563840
+    },
+    {
+      "id": "48fc1984-4fea-4185-81e2-bcec8f4b1e9a",
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f",
+      "key": "8f0f34b8740797a6903e596a5a44fdfd",
+      "credits": 56,
+      "addedAt": 1788546047254,
+      "lastCheckedAt": 1791044562313
+    },
+    {
+      "id": "6f8d1d34-b625-4fff-9ab6-d17eb7e4cbb1",
+      "ownerId": "c_ab3430a5-2c1e-4b19-a2fd-3c1131013af5",
+      "key": "12d533c6ffba490f70c78524e72c50a2",
+      "credits": 0,
+      "addedAt": 1788618611300,
+      "lastCheckedAt": 1788954058691
+    },
+    {
+      "id": "d61b180e-0dfa-4d97-98fa-26856335b56b",
+      "ownerId": "c_68183ce7-2a71-47bf-bc09-9ea832e432a7",
+      "key": "7c254d55dd0ff02f969f8a423874812a",
+      "credits": 80,
+      "addedAt": 1788706276507,
+      "lastCheckedAt": 1788706283761
+    },
+    {
+      "id": "0c3fa1d9-5a38-4f15-8d2b-04c245fc7401",
+      "ownerId": "c_ab3430a5-2c1e-4b19-a2fd-3c1131013af5",
+      "key": "8f0f34b8740797a6903e596a5a44fdfd",
+      "credits": 80,
+      "addedAt": 1788877129057,
+      "lastCheckedAt": 1788877134975
+    },
+    {
+      "id": "2cc59794-1009-4ff2-a835-e48108b86c35",
+      "ownerId": "c_19291930-4ffc-4f52-a8b1-bda37c53d52b",
+      "key": "8f0f34b8740797a6903e596a5a44fdfd",
+      "credits": 80,
+      "addedAt": 1788964312135,
+      "lastCheckedAt": 1788964325378
+    },
+    {
+      "id": "95fb37d1-3b33-455e-b686-7c6e6482f875",
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f",
+      "key": "de57ef7137b420f9bbcc3b4335564dd9",
+      "credits": 68,
+      "addedAt": 1789154899762,
+      "lastCheckedAt": 1791044560928
+    },
+    {
+      "id": "d9390266-f690-442c-9ca6-2de90381f9ff",
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f",
+      "key": "43bc6108d0c8befb0e7231a8767255ce",
+      "credits": 68,
+      "addedAt": 1789154899762,
+      "lastCheckedAt": 1791044559573
+    },
+    {
+      "id": "927c9c61-5d8c-4299-8aac-0ab7b337b245",
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f",
+      "key": "61282085b2e69a9ad01b9b68700bd368",
+      "credits": 56,
+      "addedAt": 1789154899762,
+      "lastCheckedAt": 1791044558193
+    },
+    {
+      "id": "e6c74f1e-9712-4dfa-b6e8-9abd97ebc800",
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f",
+      "key": "f7e510b2aa975815e8c2da02770f41d9",
+      "credits": 68,
+      "addedAt": 1789154899762,
+      "lastCheckedAt": 1791044555777
+    },
+    {
+      "id": "2b5ce334-6f95-4c5f-9ebb-c49aed851365",
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f",
+      "key": "80a876c6f9493a7abafbabd27220fff1",
+      "credits": 80,
+      "addedAt": 1789154899762,
+      "lastCheckedAt": 1791044553482
+    },
+    {
+      "id": "35f5cb14-aa5f-4066-b7a9-dd02697d37a8",
+      "ownerId": "c_5847cf63-80af-41a8-917f-b346942ba452",
+      "key": "d77d771933f02603cdff0e24a57398b4",
+      "credits": 0,
+      "addedAt": 1791044210402,
+      "lastCheckedAt": 1791044212855
+    },
+    {
+      "id": "d18d1918-d3e1-44cb-b143-5d4cc453edf1",
+      "ownerId": "c_dd23a117-d27c-4ff4-aa77-a423af009fb7",
+      "key": "a74b61429ab1cd8a3f71a4b878943d80",
+      "credits": 0,
+      "addedAt": 1791047862172,
+      "lastCheckedAt": 1791047864749
+    }
+  ],
+  "musicapiKeys": [
+    {
+      "id": "8fff1c51-51b8-46bf-aa92-0b60f53a4eaf",
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f",
+      "key": "10453e6da8a56463b19e30811f2d7605",
+      "credits": 75,
+      "addedAt": 1782482778892,
+      "lastCheckedAt": 1784625295393
+    },
+    {
+      "id": "14133db3-943b-4250-94c7-b1c8f51c9b36",
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f",
+      "key": "33528f0cb0d5b95fd09fffe56f6acf83",
+      "credits": 75,
+      "addedAt": 1784055164596,
+      "lastCheckedAt": 1784625297367
+    },
+    {
+      "id": "cdde45f2-0cb6-4685-9393-05092c85c279",
+      "ownerId": "c_94f5425c-b9df-4a9f-a4eb-a23e01ce384f",
+      "key": "943c321635570766dc255e3f37fcd447",
+      "credits": 75,
+      "addedAt": 1784055576038,
+      "lastCheckedAt": 1784364937103
+    }
+  ]
+}
