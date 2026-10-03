@@ -3,6 +3,10 @@
 // Menyajikan frontend statis + REST API + polling status provider.
 // ============================================================================
 
+// Vercel hanya menerima entrypoint Express jika file ini mengimpor express.
+// Routing tetap lewat node:http di bawah; impor ini tidak mengubah handler.
+import express from "express"
+void express
 import {createPersona, resolvePersona} from "./persona.js"
 import { WEBHOOK_TOKEN } from "./config.js"
 import { createServer } from "node:http"

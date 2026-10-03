@@ -3,6 +3,7 @@
   "version": "1.2.0",
   "description": "GEJEMUZIK - AI song generator (full stack)",
   "type": "module",
+  "main": "server.js",
   "scripts": {
     "start": "node app.cjs",
     "dev": "node --watch app.cjs",
