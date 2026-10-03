@@ -10,7 +10,7 @@ import { createAuth } from './auth.js';
 import { createToolRegistry } from './tools.js';
 
 export function createMcpHandler({ handleApi, withOwner, env = process.env }) {
-  const origin = new URL(env.MCP_PUBLIC_URL || 'https://ulas.tech');
+  const origin = new URL(env.MCP_PUBLIC_URL || 'https://lagu.bangalimin.com');
   if (origin.pathname !== '/' || origin.search || origin.hash || origin.username || origin.password) throw new Error('MCP_PUBLIC_URL must be a bare origin; use a domain root.');
   const local = env.MCP_ALLOW_LOCAL_HTTP === 'true' && ['127.0.0.1', 'localhost'].includes(origin.hostname);
   if (origin.protocol !== 'https:' && !local) throw new Error('MCP_PUBLIC_URL requires HTTPS.');
