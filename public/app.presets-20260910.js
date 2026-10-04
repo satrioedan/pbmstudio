@@ -917,7 +917,7 @@ function playCardSong(song) {
   // Jika lagu yang sama sedang diputar → toggle pause/play
   if (miniPlayingId === song.id) {
     if (miniAudio.paused) {
-      miniAudio.play().catch(() => {})
+      replayMiniAudio().catch(() => toast("Gagal memutar audio", "error"))
       miniPlayerUI(song, true)
     } else {
       miniAudio.pause()
@@ -969,10 +969,18 @@ function playPrevSong() {
   }
 }
 
+function replayMiniAudio() {
+  if (miniAudio.ended || miniAudio.error) {
+    const src = miniAudio.currentSrc || miniAudio.src
+    miniAudio.src = src
+    miniAudio.load()
+  }
+  return miniAudio.play()
+}
 function toggleMiniPlayPause() {
   if (!miniPlayingId) return
   if (miniAudio.paused) {
-    miniAudio.play().catch(() => {})
+    replayMiniAudio().catch(() => toast("Gagal memutar audio", "error"))
     const song = (state.songs || []).find((s) => s.id === miniPlayingId)
     if (song) miniPlayerUI(song, true)
   } else {

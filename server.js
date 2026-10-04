@@ -131,6 +131,20 @@ function boostLyricsLocally(lyrics, title, style) {
   ].join("\n").slice(0, 5000)
 }
 
+function byteSlice(data, header) {
+  const m = /^bytes=(\d*)-(\d*)$/.exec(String(header || ""))
+  if (!m || (m[1] === "" && m[2] === "")) return null
+  const size = data.length
+  let start = m[1] === "" ? null : Number(m[1])
+  let end = m[2] === "" ? null : Number(m[2])
+  if (start === null) {
+    start = Math.max(0, size - end)
+    end = size - 1
+  } else if (end === null || end >= size) end = size - 1
+  if (!Number.isFinite(start) || start < 0 || start >= size || start > end) return { invalid: true }
+  return { start, end, chunk: data.subarray(start, end + 1) }
+}
+
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -806,15 +820,22 @@ async function handleApi(req, res, url) {
         if (!localPath.startsWith(PUBLIC_DIR)) return sendJson(res, 400, { error: "Path tidak valid" })
         try {
           const data = await readFile(localPath)
-          res.writeHead(200, {
+          const part = byteSlice(data, req.headers.range)
+          if (part && part.invalid) {
+            res.writeHead(416, { "Content-Range": `bytes */${data.length}` })
+            return res.end()
+          }
+          const body = part ? part.chunk : data
+          res.writeHead(part ? 206 : 200, {
             "Content-Type": fallbackType,
             "Content-Disposition": sub === "/download" ? `attachment; filename="${filename}"` : `inline; filename="${filename}"`,
             "Accept-Ranges": "bytes",
-            "Cache-Control": "no-store",
-            "Content-Length": String(data.length),
+            "Cache-Control": "private, max-age=86400",
+            "Content-Length": String(body.length),
+            ...(part ? { "Content-Range": `bytes ${part.start}-${part.end}/${data.length}` } : {}),
           })
           if (method === "HEAD") return res.end()
-          return res.end(data)
+          return res.end(body)
         } catch {
           return sendJson(res, 404, { error: "File lokal tidak ditemukan" })
         }
@@ -828,18 +849,13 @@ async function handleApi(req, res, url) {
           "Accept": "audio/*,*/*;q=0.9",
           "Referer": PUBLIC_URL + "/",
         }
-        // Audio element sering meminta Range. Forward supaya seek/playback lebih kompatibel.
-        if (req.headers.range) headers.Range = req.headers.range
-        upstream = await fetch(src, { headers })
+        // Range tidak diteruskan. CDN sering menolaknya atau membalas 200, lalu browser
+        // gagal memutar ulang karena mengharapkan 206. Putar ulang mengunduh file utuh lagi.
+        upstream = await fetch(src, { headers, redirect: "follow" })
       }
       catch (e) { return sendJson(res, 502, { error: "Gagal mengambil sumber: " + e.message }) }
 
       if (!upstream.ok || !upstream.body) {
-        // Fallback terakhir: URL sudah divalidasi sebagai milik lagu ini, jadi aman diarahkan langsung.
-        if ([401, 403, 404].includes(upstream.status)) {
-          res.writeHead(302, { Location: src, "Cache-Control": "no-store" })
-          return res.end()
-        }
         return sendJson(res, 502, { error: "Sumber audio tidak bisa diambil: HTTP " + upstream.status })
       }
 
@@ -847,18 +863,16 @@ async function handleApi(req, res, url) {
       const headers = {
         "Content-Type": ctype,
         "Content-Disposition": sub === "/download" ? `attachment; filename="${filename}"` : `inline; filename="${filename}"`,
-        "Accept-Ranges": upstream.headers.get("accept-ranges") || "bytes",
-        "Cache-Control": "no-store",
+        "Accept-Ranges": "none",
+        "Cache-Control": "private, max-age=86400",
       }
-      for (const h of ["content-length", "content-range"]) {
-        const v = upstream.headers.get(h)
-        if (v) headers[h.replace(/(^|-)(\w)/g, (_, a, b) => a + b.toUpperCase())] = v
-      }
-      res.writeHead(upstream.status === 206 ? 206 : 200, headers)
+      const len = upstream.headers.get("content-length")
+      if (len) headers["Content-Length"] = len
+      res.writeHead(200, headers)
       if (method === "HEAD") return res.end()
       const reader = upstream.body.getReader()
       let cancelled = false
-      req.on("close", () => { cancelled = true; try { reader.cancel() } catch {} })
+      res.on("close", () => { cancelled = true; try { reader.cancel() } catch {} })
       ;(async () => {
         try {
           while (!cancelled) {
