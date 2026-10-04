@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync, renameSync } from 'node:fs';
-import { loadAppState, saveAppState } from '../lib/db.js';
+import { loadAppState, patchAppState } from '../lib/db.js';
 const text = max => z.string().trim().max(max);
 const id = z.string().regex(/^[A-Za-z0-9._-]{1,100}$/);
 const paid = { confirmed: z.literal(true).describe('True only after user approves this operation and its provider credit cost.'), request_id: z.string().uuid().describe('Unique UUID for this operation. Reuse on transport retries; do not automatically use a new UUID after an uncertain result.') };
@@ -15,7 +15,7 @@ export function sanitize(value) {
 }
 export function createToolRegistry(api, journalPath, ownerId) {
   const journal = journalPath && existsSync(journalPath) ? JSON.parse(readFileSync(journalPath, 'utf8')) : {};
-  let loaded = !journalPath || journalPath === 'neon';
+  let loaded = !journalPath;
   const load = async () => {
     if (loaded || journalPath !== 'neon') return;
     const data = await loadAppState();
@@ -24,9 +24,11 @@ export function createToolRegistry(api, journalPath, ownerId) {
   };
   const save = async () => {
     if (journalPath === 'neon') {
-      const data = await loadAppState() || {};
-      data.mcpJournal = journal;
-      await saveAppState(data);
+      await patchAppState((data) => {
+        const next = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+        next.mcpJournal = journal;
+        return next;
+      });
       return;
     }
     if (!journalPath) return;

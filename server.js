@@ -22,7 +22,7 @@ import { kieUploadCover } from "./kieCover.presets-20260910.js"
 import { kieProvider } from "./kieProvider.presets-20260910.js"
 import { musicapiProvider } from "./musicapiProvider.js"
 import { crunProvider } from "./crunProvider.js"
-import { store, withOwner, storeReady, flushStore } from "./store.js"
+import { store, withOwner, storeReady, flushStore, beginRequest, endRequest } from "./store.js"
 
 // BASE_PATH: dukungan pemasangan di sub-path (mis. https://host/evo/).
 // Kosong = root. Non-kosong = leading slash, no trailing slash (e.g. "/evo").
@@ -129,6 +129,14 @@ function boostLyricsLocally(lyrics, title, style) {
     "[Outro]",
     hook,
   ].join("\n").slice(0, 5000)
+}
+
+function sumCredits(keys) {
+  return (Array.isArray(keys) ? keys : []).reduce((sum, key) => {
+    if (key.credits === null || key.credits === undefined || key.credits === "") return sum
+    const value = Number(key.credits)
+    return sum + (Number.isFinite(value) ? value : 0)
+  }, 0)
 }
 
 function byteSlice(data, header) {
@@ -1018,7 +1026,7 @@ async function handleApi(req, res, url) {
   // GET /api/upload-keys -> daftar kunci tersamar + ringkasan kredit
   if (method === "GET" && pathname === "/api/upload-keys") {
     const keys = store.listUploadKeys()
-    const totalCredits = keys.reduce((sum, k) => sum + (k.credits ?? 0), 0)
+    const totalCredits = sumCredits(keys)
     return sendJson(res, 200, { keys, count: keys.length, totalCredits })
   }
 
@@ -1040,10 +1048,10 @@ async function handleApi(req, res, url) {
     const raw = store.getUploadRawKeys()
     await Promise.all(raw.map(async ({ id, key }) => {
       try { store.updateUploadKeyCredits(id, await uploadCover.checkCredits(key)) }
-      catch { store.updateUploadKeyCredits(id, 0) }
+      catch { /* saldo terakhir tetap dipakai jika cek gagal */ }
     }))
     const keys = store.listUploadKeys()
-    const totalCredits = keys.reduce((sum, k) => sum + (k.credits ?? 0), 0)
+    const totalCredits = sumCredits(keys)
     return sendJson(res, 200, { keys, count: keys.length, totalCredits })
   }
 
@@ -1068,7 +1076,7 @@ async function handleApi(req, res, url) {
         store.updateUploadKeyCredits(keyId, credits)
         return sendJson(res, 200, { id: keyId, credits })
       } catch (e) {
-        store.updateUploadKeyCredits(keyId, 0)
+        /* saldo terakhir tetap dipakai jika cek gagal */
         return sendJson(res, 502, { error: e.message })
       }
     }
@@ -1111,7 +1119,7 @@ async function handleApi(req, res, url) {
   // GET /api/keys -> daftar key tersamar + ringkasan kredit
   if (method === "GET" && pathname === "/api/keys") {
     const keys = store.listKeys()
-    const totalCredits = keys.reduce((sum, k) => sum + (k.credits ?? 0), 0)
+    const totalCredits = sumCredits(keys)
     return sendJson(res, 200, { keys, count: keys.length, totalCredits })
   }
 
@@ -1127,10 +1135,10 @@ async function handleApi(req, res, url) {
     const raw = store.getRawKeys()
     await Promise.all(raw.map(async ({ id, key }) => {
       try { store.updateKeyCredits(id, await provider.checkCredits(key)) }
-      catch { store.updateKeyCredits(id, 0) }
+      catch { /* saldo terakhir tetap dipakai jika cek gagal */ }
     }))
     const keys = store.listKeys()
-    const totalCredits = keys.reduce((sum, k) => sum + (k.credits ?? 0), 0)
+    const totalCredits = sumCredits(keys)
     return sendJson(res, 200, { keys, count: keys.length, totalCredits })
   }
 
@@ -1155,7 +1163,6 @@ async function handleApi(req, res, url) {
         store.updateKeyCredits(keyId, credits)
         return sendJson(res, 200, { id: keyId, credits })
       } catch (e) {
-        store.updateKeyCredits(keyId, 0)
         return sendJson(res, 502, { error: e.message })
       }
     }
@@ -1240,7 +1247,7 @@ async function handleApi(req, res, url) {
   // ------------- KUNCI KIE AI : MULTI KEY -------------------------------
   if (method === "GET" && pathname === "/api/kie-keys") {
     const keys = store.listKieKeys()
-    const totalCredits = keys.reduce((sum, k) => sum + (k.credits ?? 0), 0)
+    const totalCredits = sumCredits(keys)
     return sendJson(res, 200, { keys, count: keys.length, totalCredits })
   }
   if (method === "POST" && pathname === "/api/kie-keys") {
@@ -1261,12 +1268,12 @@ async function handleApi(req, res, url) {
         store.updateKieKeyCredits(id, credits)
         return { id, ok: true, credits }
       } catch (e) {
-        store.updateKieKeyCredits(id, 0)
+        /* saldo terakhir tetap dipakai jika cek gagal */
         return { id, ok: false, credits: 0, error: e.message }
       }
     }))
     const keys = store.listKieKeys()
-    const totalCredits = keys.reduce((sum, k) => sum + (k.credits ?? 0), 0)
+    const totalCredits = sumCredits(keys)
     const validCount = results.filter((r) => r.ok).length
     const invalidCount = results.length - validCount
     return sendJson(res, invalidCount && !validCount ? 502 : 200, { keys, count: keys.length, totalCredits, validCount, invalidCount, results, ...(invalidCount && !validCount ? { error: results[0]?.error || "Semua key KIE AI gagal divalidasi" } : {}) })
@@ -1283,7 +1290,7 @@ async function handleApi(req, res, url) {
     if (!entry) return sendJson(res, 404, { error: "KIE AI key tidak ditemukan" })
     if (method === "POST" && sub === "/check") {
       try { const credits = await kieProvider.checkCredits(entry.key); store.updateKieKeyCredits(keyId, credits); return sendJson(res, 200, { id: keyId, credits }) }
-      catch (e) { store.updateKieKeyCredits(keyId, 0); return sendJson(res, 502, { error: e.message }) }
+      catch (e) { return sendJson(res, 502, { error: e.message }) }
     }
     if (method === "GET" && sub === "/reveal") return sendJson(res, 200, { id: keyId, key: entry.key })
     if (method === "DELETE" && !sub) { store.deleteKieKey(keyId); return sendJson(res, 200, { ok: true }) }
@@ -1292,7 +1299,7 @@ async function handleApi(req, res, url) {
   // ------------- KUNCI MusicAPI.ai : MULTI KEY ---------------------------
   if (method === "GET" && pathname === "/api/musicapi-keys") {
     const keys = store.listMusicApiKeys()
-    const totalCredits = keys.reduce((sum, k) => sum + (k.credits ?? 0), 0)
+    const totalCredits = sumCredits(keys)
     return sendJson(res, 200, { keys, count: keys.length, totalCredits })
   }
   if (method === "POST" && pathname === "/api/musicapi-keys") {
@@ -1308,10 +1315,10 @@ async function handleApi(req, res, url) {
     const raw = store.getMusicApiRawKeys()
     await Promise.all(raw.map(async ({ id, key }) => {
       try { store.updateMusicApiKeyCredits(id, await musicapiProvider.checkCredits(key)) }
-      catch { store.updateMusicApiKeyCredits(id, 0) }
+      catch { /* saldo terakhir tetap dipakai jika cek gagal */ }
     }))
     const keys = store.listMusicApiKeys()
-    const totalCredits = keys.reduce((sum, k) => sum + (k.credits ?? 0), 0)
+    const totalCredits = sumCredits(keys)
     return sendJson(res, 200, { keys, count: keys.length, totalCredits })
   }
   if (method === "DELETE" && pathname === "/api/musicapi-keys") {
@@ -1326,7 +1333,7 @@ async function handleApi(req, res, url) {
     if (!entry) return sendJson(res, 404, { error: "MusicAPI.ai key tidak ditemukan" })
     if (method === "POST" && sub === "/check") {
       try { const credits = await musicapiProvider.checkCredits(entry.key); store.updateMusicApiKeyCredits(keyId, credits); return sendJson(res, 200, { id: keyId, credits }) }
-      catch (e) { store.updateMusicApiKeyCredits(keyId, 0); return sendJson(res, 502, { error: e.message }) }
+      catch (e) { return sendJson(res, 502, { error: e.message }) }
     }
     if (method === "GET" && sub === "/reveal") return sendJson(res, 200, { id: keyId, key: entry.key })
     if (method === "DELETE" && !sub) { store.deleteMusicApiKey(keyId); return sendJson(res, 200, { ok: true }) }
@@ -1335,7 +1342,7 @@ async function handleApi(req, res, url) {
   // ------------- KUNCI crun.ai : MULTI KEY --------------------------------
   if (method === "GET" && pathname === "/api/crun-keys") {
     const keys = store.listCrunKeys()
-    const totalCredits = keys.reduce((sum, k) => sum + (k.credits ?? 0), 0)
+    const totalCredits = sumCredits(keys)
     return sendJson(res, 200, { keys, count: keys.length, totalCredits })
   }
   if (method === "POST" && pathname === "/api/crun-keys") {
@@ -1352,10 +1359,10 @@ async function handleApi(req, res, url) {
     const raw = store.getCrunRawKeys()
     await Promise.all(raw.map(async ({ id, key }) => {
       try { store.updateCrunKeyCredits(id, await crunProvider.checkCredits(key)) }
-      catch { store.updateCrunKeyCredits(id, 0) }
+      catch { /* saldo terakhir tetap dipakai jika cek gagal */ }
     }))
     const keys = store.listCrunKeys()
-    const totalCredits = keys.reduce((sum, k) => sum + (k.credits ?? 0), 0)
+    const totalCredits = sumCredits(keys)
     return sendJson(res, 200, { keys, count: keys.length, totalCredits })
   }
   if (method === "DELETE" && pathname === "/api/crun-keys") {
@@ -1370,7 +1377,7 @@ async function handleApi(req, res, url) {
     if (!entry) return sendJson(res, 404, { error: "crun.ai key tidak ditemukan" })
     if (method === "POST" && sub === "/check") {
       try { const credits = await crunProvider.checkCredits(entry.key); store.updateCrunKeyCredits(keyId, credits); return sendJson(res, 200, { id: keyId, credits }) }
-      catch (e) { store.updateCrunKeyCredits(keyId, 0); return sendJson(res, 502, { error: e.message }) }
+      catch (e) { return sendJson(res, 502, { error: e.message }) }
     }
     if (method === "GET" && sub === "/reveal") return sendJson(res, 200, { id: keyId, key: entry.key })
     if (method === "DELETE" && !sub) { store.deleteCrunKey(keyId); return sendJson(res, 200, { ok: true }) }
@@ -1639,15 +1646,20 @@ const server = createServer(async (req, res) => {
     await storeReady
     // Passenger may append a slash to extensionless OAuth URLs.
     const mcpPath = url.pathname.replace(/\/+$/, "") || "/"
-    if (mcpHandler?.matches(mcpPath)) {
-      return mcpHandler.handle(req, res)
-    }
-    if (url.pathname.startsWith("/api/")) {
-      const ownerId = getOwnerId(req, res)
-      await withOwner(ownerId, () => handleApi(req, res, url))
-      await flushStore()
-    } else {
-      await serveStatic(req, res, url)
+    const usesStore = mcpHandler?.matches(mcpPath) || url.pathname.startsWith("/api/")
+    if (usesStore) await beginRequest()
+    try {
+      if (mcpHandler?.matches(mcpPath)) {
+        await mcpHandler.handle(req, res)
+      } else if (url.pathname.startsWith("/api/")) {
+        const ownerId = getOwnerId(req, res)
+        await withOwner(ownerId, () => handleApi(req, res, url))
+      } else {
+        await serveStatic(req, res, url)
+      }
+      if (usesStore) await flushStore()
+    } finally {
+      if (usesStore) endRequest()
     }
   } catch (e) {
     if (!res.headersSent) sendJson(res, 500, { error: "Server error: " + e.message })

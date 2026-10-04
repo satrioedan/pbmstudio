@@ -2,7 +2,8 @@
 // Data lagu dan API key dipisah per browser/perangkat memakai ownerId.
 
 import "./config.js"
-import { databaseUrl, loadAppState, saveAppState } from "./lib/db.js"
+import { databaseUrl, loadAppState, patchAppState } from "./lib/db.js"
+import { mergeStates } from "./lib/stateMerge.js"
 import { readFileSync, writeFileSync, existsSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { dirname, join } from "node:path"
@@ -184,12 +185,26 @@ export function maskKey(key) {
 
 let writeChain = Promise.resolve()
 let dbReady = !databaseUrl()
+let loadedRevision = 0
+let baseSnapshot = null
+let requestDepth = 0
 
 function persist(next) {
   if (databaseUrl()) {
     if (!dbReady) throw new Error("Database belum siap. Coba lagi sebentar.")
     const snapshot = JSON.parse(JSON.stringify(next))
-    const run = () => saveAppState(snapshot)
+    const base = baseSnapshot ? JSON.parse(JSON.stringify(baseSnapshot)) : null
+    const run = async () => {
+      const saved = await patchAppState((current) => {
+        const dbState = normalizeState(current || makeInitialState())
+        const merged = mergeStates(dbState, snapshot, base || dbState)
+        merged.revision = (Number(dbState.revision) || 0) + 1
+        return merged
+      })
+      loadedRevision = Number(saved.revision) || loadedRevision + 1
+      baseSnapshot = JSON.parse(JSON.stringify(saved))
+      state.revision = loadedRevision
+    }
     writeChain = writeChain.then(run, run)
     return
   }
@@ -214,7 +229,19 @@ async function hydrate() {
   if (!databaseUrl()) return
   const data = await loadAppState()
   if (data && typeof data === "object") state = normalizeState(data)
+  loadedRevision = Number(state.revision) || 0
+  baseSnapshot = JSON.parse(JSON.stringify(state))
   dbReady = true
+}
+
+export async function beginRequest() {
+  await writeChain
+  if (requestDepth === 0) await hydrate()
+  requestDepth++
+}
+
+export function endRequest() {
+  requestDepth = Math.max(0, requestDepth - 1)
 }
 
 function ensureOwnerCredits() {
@@ -342,7 +369,7 @@ export const store = {
   updateKeyCredits(id, credits) {
     const k = state.apiKeys.find((x) => x.id === id && owns(x))
     if (!k) return null
-    k.credits = credits
+    k.credits = Number.isFinite(Number(credits)) ? Number(credits) : null
     k.lastCheckedAt = Date.now()
     persist(state)
     return k
@@ -375,7 +402,7 @@ export const store = {
   updateUploadKeyCredits(id, credits) {
     const k = state.uploadKeys.find((x) => x.id === id && owns(x))
     if (!k) return null
-    k.credits = credits
+    k.credits = Number.isFinite(Number(credits)) ? Number(credits) : null
     k.lastCheckedAt = Date.now()
     persist(state)
     return k
@@ -408,7 +435,7 @@ export const store = {
   updateGeminiKeyCredits(id, credits) {
     const k = state.geminiKeys.find((x) => x.id === id && owns(x))
     if (!k) return null
-    k.credits = credits
+    k.credits = Number.isFinite(Number(credits)) ? Number(credits) : null
     k.lastCheckedAt = Date.now()
     persist(state)
     return k
@@ -434,7 +461,7 @@ export const store = {
   listKieKeys() { return listPool(ownedList(state.kieKeys)) },
   getKieKeyById(id) { return state.kieKeys.find((k) => k.id === id && owns(k)) || null },
   addKieKeys(rawText) { const added = addToPoolForOwner(state.kieKeys, rawText); if (added) persist(state); return added },
-  updateKieKeyCredits(id, credits) { const k = state.kieKeys.find((x) => x.id === id && owns(x)); if (!k) return null; k.credits = credits; k.lastCheckedAt = Date.now(); persist(state); return k },
+  updateKieKeyCredits(id, credits) { const k = state.kieKeys.find((x) => x.id === id && owns(x)); if (!k) return null; k.credits = Number.isFinite(Number(credits)) ? Number(credits) : null; k.lastCheckedAt = Date.now(); persist(state); return k },
   deleteKieKey(id) { const before = state.kieKeys.length; const owner = currentOwner(); state.kieKeys = state.kieKeys.filter((k) => !(k.id === id && k.ownerId === owner)); if (state.kieKeys.length !== before) persist(state); return state.kieKeys.length < before },
   deleteAllKieKeys() { const owner = currentOwner(); state.kieKeys = state.kieKeys.filter((k) => k.ownerId !== owner); state.cursors[cursorKey("kieKeyCursor")] = 0; persist(state) },
   getKieKeyCursor() { return state.cursors[cursorKey("kieKeyCursor")] || 0 },
@@ -445,7 +472,7 @@ export const store = {
   listMusicApiKeys() { return listPool(ownedList(state.musicapiKeys)) },
   getMusicApiKeyById(id) { return state.musicapiKeys.find((k) => k.id === id && owns(k)) || null },
   addMusicApiKeys(rawText) { const added = addToPoolForOwner(state.musicapiKeys, rawText); if (added) persist(state); return added },
-  updateMusicApiKeyCredits(id, credits) { const k = state.musicapiKeys.find((x) => x.id === id && owns(x)); if (!k) return null; k.credits = credits; k.lastCheckedAt = Date.now(); persist(state); return k },
+  updateMusicApiKeyCredits(id, credits) { const k = state.musicapiKeys.find((x) => x.id === id && owns(x)); if (!k) return null; k.credits = Number.isFinite(Number(credits)) ? Number(credits) : null; k.lastCheckedAt = Date.now(); persist(state); return k },
   deleteMusicApiKey(id) { const before = state.musicapiKeys.length; const owner = currentOwner(); state.musicapiKeys = state.musicapiKeys.filter((k) => !(k.id === id && k.ownerId === owner)); if (state.musicapiKeys.length !== before) persist(state); return state.musicapiKeys.length < before },
   deleteAllMusicApiKeys() { const owner = currentOwner(); state.musicapiKeys = state.musicapiKeys.filter((k) => k.ownerId !== owner); state.cursors[cursorKey("musicapiKeyCursor")] = 0; persist(state) },
   getMusicApiKeyCursor() { return state.cursors[cursorKey("musicapiKeyCursor")] || 0 },
@@ -456,7 +483,7 @@ export const store = {
   listCrunKeys() { return listPool(ownedList(state.crunKeys)) },
   getCrunKeyById(id) { return state.crunKeys.find((k) => k.id === id && owns(k)) || null },
   addCrunKeys(rawText) { const added = addToPoolForOwner(state.crunKeys, rawText); if (added) persist(state); return added },
-  updateCrunKeyCredits(id, credits) { const k = state.crunKeys.find((x) => x.id === id && owns(x)); if (!k) return null; k.credits = credits; k.lastCheckedAt = Date.now(); persist(state); return k },
+  updateCrunKeyCredits(id, credits) { const k = state.crunKeys.find((x) => x.id === id && owns(x)); if (!k) return null; k.credits = Number.isFinite(Number(credits)) ? Number(credits) : null; k.lastCheckedAt = Date.now(); persist(state); return k },
   deleteCrunKey(id) { const before = state.crunKeys.length; const owner = currentOwner(); state.crunKeys = state.crunKeys.filter((k) => !(k.id === id && k.ownerId === owner)); if (state.crunKeys.length !== before) persist(state); return state.crunKeys.length < before },
   deleteAllCrunKeys() { const owner = currentOwner(); state.crunKeys = state.crunKeys.filter((k) => k.ownerId !== owner); state.cursors[cursorKey("crunKeyCursor")] = 0; persist(state) },
   getCrunKeyCursor() { return state.cursors[cursorKey("crunKeyCursor")] || 0 },

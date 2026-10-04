@@ -1570,16 +1570,20 @@ function bindKeyItems(root, kind) {
     })
   })
 }
+function keySummary(d) {
+  const unchecked = (d.keys || []).filter((k) => k.credits === null || k.credits === undefined).length
+  return `${d.count} key \u00B7 total ${d.totalCredits ?? 0} kredit` + (unchecked ? ` \u00B7 ${unchecked} belum dicek` : "")
+}
 async function loadKeys() {
   const d = await api("/api/keys")
-  $("#keys-summary").textContent = `${d.count} key \u00B7 total ${d.totalCredits} kredit`
+  $("#keys-summary").textContent = keySummary(d)
   const list = $("#keys-list")
   list.innerHTML = d.keys.length ? d.keys.map((k) => keyItemHtml(k, "apiframe")).join("") : '<li class="empty">Belum ada key.</li>'
   bindKeyItems(list, "apiframe")
 }
 async function loadUploadKeys() {
   const d = await api("/api/upload-keys")
-  $("#upkeys-summary").textContent = `${d.count} key \u00B7 total ${d.totalCredits} kredit`
+  $("#upkeys-summary").textContent = keySummary(d)
   const list = $("#upkeys-list")
   list.innerHTML = d.keys.length ? d.keys.map((k) => keyItemHtml(k, "suno")).join("") : '<li class="empty">Belum ada key.</li>'
   bindKeyItems(list, "suno")
@@ -1595,22 +1599,21 @@ async function loadGeminiKeys() {
 }
 async function loadKieKeys() {
   const d = await api("/api/kie-keys")
-  const total = d.totalCredits ?? 0
-  $("#kiekeys-summary").textContent = `${d.count} key \u00B7 total ${total} kredit`
+  $("#kiekeys-summary").textContent = keySummary(d)
   const list = $("#kiekeys-list")
   list.innerHTML = d.keys.length ? d.keys.map((k) => keyItemHtml(k, "kie")).join("") : '<li class="empty">Belum ada key.</li>'
   bindKeyItems(list, "kie")
 }
 async function loadMusicApiKeys() {
   const d = await api("/api/musicapi-keys")
-  $("#musicapikeys-summary").textContent = `${d.count} key \u00B7 total ${d.totalCredits ?? 0} kredit`
+  $("#musicapikeys-summary").textContent = keySummary(d)
   const list = $("#musicapikeys-list")
   list.innerHTML = d.keys.length ? d.keys.map((k) => keyItemHtml(k, "musicapi")).join("") : '<li class="empty">Belum ada key.</li>'
   bindKeyItems(list, "musicapi")
 }
 async function loadCrunKeys() {
   const d = await api("/api/crun-keys")
-  $("#crunkeys-summary").textContent = `${d.count} key \u00B7 total ${d.totalCredits ?? 0} kredit`
+  $("#crunkeys-summary").textContent = keySummary(d)
   const list = $("#crunkeys-list")
   list.innerHTML = d.keys.length ? d.keys.map((k) => keyItemHtml(k, "crun")).join("") : '<li class="empty">Belum ada key.</li>'
   bindKeyItems(list, "crun")
