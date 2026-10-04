@@ -81,6 +81,7 @@ test('OAuth + official MCP client + music tool isolation and replay protection',
   await t.test('Origin rejection', async () => {
     assert.equal((await fetch(base + '/mcp', { headers: { Authorization: 'Bearer ' + tokens.access_token, Origin: 'https://evil.example' } })).status, 403);
     assert.equal((await fetch(base + '/mcp', { method: 'OPTIONS', headers: { Origin: 'https://chat.openai.com', 'Access-Control-Request-Method': 'POST' } })).status, 204);
+    assert.equal((await fetch(base + '/authorize', { headers: { Origin: 'null' } })).status, 400);
     assert.equal((await fetch(base + '/mcp-login', { method: 'POST', headers: { Origin: 'https://chatgpt.com', 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'secret=x' })).status, 403);
   });
   await t.test('refresh rotates and scope cannot escalate', async () => {

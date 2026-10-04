@@ -43,7 +43,7 @@ export function createMcpHandler({ handleApi, withOwner, env = process.env }) {
     res.setHeader('Content-Security-Policy', "default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
     const requestOrigin = req.headers.origin;
     const chatOrigins = ['https://chatgpt.com', 'https://chat.openai.com', 'https://platform.openai.com'];
-    const crossSite = requestOrigin && requestOrigin !== origin.origin;
+    const crossSite = requestOrigin && requestOrigin !== 'null' && requestOrigin !== origin.origin;
     if (crossSite && (!chatOrigins.includes(requestOrigin) || req.path === '/mcp-login')) return res.status(403).json({ error: 'Origin rejected' });
     if (crossSite && (req.path === '/mcp' || req.path === '/mcp/')) {
       res.setHeader('Access-Control-Allow-Origin', requestOrigin);
