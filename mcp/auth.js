@@ -89,7 +89,7 @@ export function createAuth(config) {
       const flow = random(), csrf = random();
       const pendingGrant = { ...params, scopes: requested, csrf, clientId: c.client_id, expires: Date.now() + 300_000 };
       await grants.put('pending', flow, pendingGrant, pendingGrant.expires);
-      res.cookie('gjm_mcp_flow', csrf, { httpOnly: true, secure: config.secure, sameSite: 'lax', path: '/mcp-login', maxAge: 300_000 });
+      res.cookie('gjm_mcp_flow', csrf, { httpOnly: true, secure: config.secure, sameSite: config.secure ? 'none' : 'lax', partitioned: config.secure, path: '/mcp-login', maxAge: 300_000 });
       res.type('html').send(`<!doctype html><html lang="id"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Hubungkan GEJEMUZIK</title><body><main><h1>Hubungkan GEJEMUZIK ke ChatGPT</h1><p>Izinkan akses koleksi musik${requested.includes('music:write') ? ' dan pembuatan musik yang dapat memakai kredit provider' : ''}.</p><form method="post" action="/mcp-login"><input type="hidden" name="flow" value="${flow}"><label>Kode akses pemilik <input type="password" name="secret" required autocomplete="current-password" maxlength="256"></label><button type="submit">Izinkan koneksi</button></form><p>Tutup halaman ini untuk membatalkan.</p></main></body></html>`);
     },
     async challengeForAuthorizationCode(c, code) {
@@ -138,7 +138,7 @@ export function createAuth(config) {
     await grants.put('code', code, codeGrant, codeGrant.expires);
     const redirect = new URL(g.redirectUri); redirect.searchParams.set('code', code);
     if (g.state !== undefined) redirect.searchParams.set('state', g.state);
-    res.clearCookie('gjm_mcp_flow', { path: '/mcp-login', secure: config.secure, httpOnly: true, sameSite: 'lax' });
+    res.clearCookie('gjm_mcp_flow', { path: '/mcp-login', secure: config.secure, httpOnly: true, sameSite: config.secure ? 'none' : 'lax', partitioned: config.secure });
     res.redirect(303, redirect.href);
   }
   return { provider, login };
