@@ -40,7 +40,7 @@ export function createMcpHandler({ handleApi, withOwner, env = process.env }) {
   app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-store'); res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'no-referrer');
-    res.setHeader('Content-Security-Policy', "default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
+    res.setHeader('Content-Security-Policy', "default-src 'none'; form-action 'self' https://chatgpt.com https://chat.openai.com; frame-ancestors 'none'; base-uri 'none'");
     const requestOrigin = req.headers.origin;
     const chatOrigins = ['https://chatgpt.com', 'https://chat.openai.com', 'https://platform.openai.com'];
     const crossSite = requestOrigin && requestOrigin !== 'null' && requestOrigin !== origin.origin;

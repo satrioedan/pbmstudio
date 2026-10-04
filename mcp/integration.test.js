@@ -46,7 +46,7 @@ test('OAuth + official MCP client + music tool isolation and replay protection',
     const r = await fetch(base + '/authorize?' + new URLSearchParams({ ...params, redirect_uri: 'https://attacker.example/cb' }), { redirect: 'manual' }); assert.equal(r.status, 400);
   });
   const auth = await fetch(base + '/authorize?' + new URLSearchParams(params));
-  assert.equal(auth.status, 200); const setCookie = auth.headers.get('set-cookie'); assert.match(setCookie, /HttpOnly/i); const cookie = setCookie.split(';')[0];
+  assert.equal(auth.status, 200); assert.match(auth.headers.get('content-security-policy'), /form-action[^;]*https:\/\/chatgpt\.com/); const setCookie = auth.headers.get('set-cookie'); assert.match(setCookie, /HttpOnly/i); const cookie = setCookie.split(';')[0];
   const flow = (await auth.text()).match(/name="flow" value="([^"]+)"/)[1];
   await t.test('login requires CSRF cookie and owner secret', async () => {
     assert.equal((await post('/mcp-login', { flow, secret: env.MCP_LOGIN_SECRET })).status, 403);

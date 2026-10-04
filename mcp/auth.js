@@ -129,8 +129,11 @@ export function createAuth(config) {
     if (failed >= 10) return res.status(429).send('Terlalu banyak percobaan. Coba lagi 15 menit.');
     const g = await read('pending', req.body.flow);
     const cookie = String(req.headers.cookie || '').split(';').map(s => s.trim()).find(s => s.startsWith('gjm_mcp_flow='))?.slice(13);
-    if (!g || !equal(cookie || '', g.csrf) || !equal(req.body.secret || '', config.loginSecret)) {
-      failed++; return res.status(403).send('Koneksi ditolak. Mulai ulang koneksi dan periksa kode akses.');
+    const secretOk = equal(req.body.secret || '', config.loginSecret);
+    if (!g || !equal(cookie || '', g.csrf) || !secretOk) {
+      failed++;
+      const used = !g && secretOk;
+      return res.status(403).send(used ? 'Izin sudah dikirim. Kembali ke ChatGPT, atau mulai ulang koneksi jika halaman tidak berpindah.' : 'Koneksi ditolak. Mulai ulang koneksi dan periksa kode akses.');
     }
     await grants.remove('pending', req.body.flow);
     const code = random();
