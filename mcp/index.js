@@ -42,8 +42,17 @@ export function createMcpHandler({ handleApi, withOwner, env = process.env }) {
     res.setHeader('Referrer-Policy', 'no-referrer');
     res.setHeader('Content-Security-Policy', "default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
     const requestOrigin = req.headers.origin;
-    const allowed = [origin.origin, 'https://chatgpt.com'];
-    if (requestOrigin && (!allowed.includes(requestOrigin) || (req.path === '/mcp-login' && requestOrigin !== origin.origin))) return res.status(403).json({ error: 'Origin rejected' });
+    const chatOrigins = ['https://chatgpt.com', 'https://chat.openai.com', 'https://platform.openai.com'];
+    const crossSite = requestOrigin && requestOrigin !== origin.origin;
+    if (crossSite && (!chatOrigins.includes(requestOrigin) || req.path === '/mcp-login')) return res.status(403).json({ error: 'Origin rejected' });
+    if (crossSite && (req.path === '/mcp' || req.path === '/mcp/')) {
+      res.setHeader('Access-Control-Allow-Origin', requestOrigin);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, MCP-Protocol-Version, MCP-Session-Id, Last-Event-ID');
+      res.setHeader('Access-Control-Expose-Headers', 'WWW-Authenticate, MCP-Session-Id');
+      if (req.method === 'OPTIONS') return res.status(204).end();
+    }
     next();
   });
   app.post('/mcp-login', express.urlencoded({ extended: false, limit: '4kb' }), login);

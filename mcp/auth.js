@@ -27,7 +27,7 @@ export function createAuth(config) {
     try { url = new URL(uri); } catch { return false; }
     if (url.protocol !== 'https:' || url.hash || url.search || url.username || url.password || url.port) return false;
     if (config.redirects.includes(uri)) return true;
-    if (url.origin !== 'https://chatgpt.com') return false;
+    if (!['https://chatgpt.com', 'https://chat.openai.com'].includes(url.origin)) return false;
     return url.pathname === '/connector_platform_oauth_redirect' || /^\/connector\/oauth\/[A-Za-z0-9_-]{6,128}$/.test(url.pathname);
   }
   class RedirectAllowList extends Array {

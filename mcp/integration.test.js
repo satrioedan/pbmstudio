@@ -78,7 +78,11 @@ test('OAuth + official MCP client + music tool isolation and replay protection',
     assert.equal((await client.callTool({ name: 'create_song', arguments: { ...args, confirmed: false } })).isError, true);
     assert.equal(writes, 1);
   });
-  await t.test('Origin rejection', async () => assert.equal((await fetch(base + '/mcp', { headers: { Authorization: 'Bearer ' + tokens.access_token, Origin: 'https://evil.example' } })).status, 403));
+  await t.test('Origin rejection', async () => {
+    assert.equal((await fetch(base + '/mcp', { headers: { Authorization: 'Bearer ' + tokens.access_token, Origin: 'https://evil.example' } })).status, 403);
+    assert.equal((await fetch(base + '/mcp', { method: 'OPTIONS', headers: { Origin: 'https://chat.openai.com', 'Access-Control-Request-Method': 'POST' } })).status, 204);
+    assert.equal((await fetch(base + '/mcp-login', { method: 'POST', headers: { Origin: 'https://chatgpt.com', 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'secret=x' })).status, 403);
+  });
   await t.test('refresh rotates and scope cannot escalate', async () => {
     const refreshGrant = { grant_type: 'refresh_token', client_id: env.MCP_CLIENT_ID, client_secret: env.MCP_CLIENT_SECRET, refresh_token: tokens.refresh_token, resource: base + '/mcp' };
     assert.equal((await post('/token', { ...refreshGrant, scope: 'admin' })).status, 400);
