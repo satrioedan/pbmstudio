@@ -1,5 +1,5 @@
 import { randomBytes, createHash, timingSafeEqual } from 'node:crypto';
-import { InvalidGrantError, InvalidTokenError, InvalidScopeError, InvalidTargetError } from '@modelcontextprotocol/sdk/server/auth/errors.js';
+import { InvalidGrantError, InvalidTokenError, InvalidScopeError, InvalidTargetError, InvalidClientMetadataError } from '@modelcontextprotocol/sdk/server/auth/errors.js';
 import { createGrantStore } from './grants.js';
 const random = () => randomBytes(32).toString('base64url');
 const digest = s => createHash('sha256').update(String(s)).digest();
@@ -22,12 +22,38 @@ export function createAuth(config) {
     const allowed = new Set([canonical, canonical.slice(0, -1)]);
     if (resource && !allowed.has(resource.href)) throw new InvalidTargetError('Invalid resource');
   };
+  function allowedRedirect(uri) {
+    let url;
+    try { url = new URL(uri); } catch { return false; }
+    if (url.protocol !== 'https:' || url.hash || url.search || url.username || url.password || url.port) return false;
+    if (config.redirects.includes(uri)) return true;
+    if (url.origin !== 'https://chatgpt.com') return false;
+    return url.pathname === '/connector_platform_oauth_redirect' || /^\/connector\/oauth\/[A-Za-z0-9_-]{6,128}$/.test(url.pathname);
+  }
+  class RedirectAllowList extends Array {
+    includes(uri) { return super.includes(uri) || allowedRedirect(uri); }
+  }
   const client = {
     client_id: config.clientId, client_secret: config.clientSecret,
-    redirect_uris: config.redirects, token_endpoint_auth_method: 'client_secret_post',
+    redirect_uris: new RedirectAllowList(...config.redirects), token_endpoint_auth_method: 'client_secret_post',
     grant_types: ['authorization_code', 'refresh_token'], response_types: ['code'],
     scope: scopes.join(' '), client_name: 'GEJEMUZIK ChatGPT',
   };
+  async function registerClient(info) {
+    if (!info.redirect_uris?.length || !info.redirect_uris.every(allowedRedirect)) throw new InvalidClientMetadataError('Redirect URI must be a ChatGPT connector callback');
+    if (await grants.count('client') >= 100) throw new InvalidClientMetadataError('Client registration capacity reached');
+    const isPublic = info.token_endpoint_auth_method === 'none';
+    const stored = {
+      ...info,
+      token_endpoint_auth_method: isPublic ? 'none' : 'client_secret_post',
+      grant_types: ['authorization_code', 'refresh_token'],
+      response_types: ['code'],
+      scope: scopes.join(' '),
+    };
+    if (isPublic) { delete stored.client_secret; delete stored.client_secret_expires_at; }
+    await grants.put('client', stored.client_id, stored, Date.now() + 365 * 86400_000);
+    return stored;
+  }
   async function issue(grant) {
     await guardCapacity();
     const token = random(), renewal = random(), family = grant.family || random();
@@ -39,7 +65,13 @@ export function createAuth(config) {
       refresh_token: renewal, scope: grant.scopes.join(' ') };
   }
   const provider = {
-    clientsStore: { getClient: id => id === client.client_id ? client : undefined },
+    clientsStore: {
+      async getClient(id) {
+        if (id === client.client_id) return client;
+        return await grants.get('client', id) || undefined;
+      },
+      registerClient,
+    },
     async authorize(c, params, res) {
       await guardCapacity(); resourceCheck(params.resource);
       const requested = params.scopes?.length ? params.scopes : scopes;

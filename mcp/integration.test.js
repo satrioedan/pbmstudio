@@ -31,10 +31,17 @@ test('OAuth + official MCP client + music tool isolation and replay protection',
   const post = (path, data, headers = {}) => fetch(base + path, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...headers }, body: new URLSearchParams(data), redirect: 'manual' });
   await t.test('unauthenticated access rejected with discovery', async () => {
     const r = await fetch(base + '/mcp', { method: 'POST' }); assert.equal(r.status, 401); assert.match(r.headers.get('www-authenticate'), /oauth-protected-resource/);
-    const meta = await (await fetch(base + '/.well-known/oauth-authorization-server')).json(); assert.ok(meta.code_challenge_methods_supported.includes('S256')); assert.equal(meta.registration_endpoint, undefined);
+    const meta = await (await fetch(base + '/.well-known/oauth-authorization-server')).json(); assert.ok(meta.code_challenge_methods_supported.includes('S256')); assert.equal(meta.registration_endpoint, base + '/register');
   });
   const verifier = randomBytes(32).toString('base64url');
   const params = { client_id: env.MCP_CLIENT_ID, response_type: 'code', redirect_uri: env.MCP_REDIRECT_URIS, code_challenge: createHash('sha256').update(verifier).digest('base64url'), code_challenge_method: 'S256', scope: 'music:read music:write', resource: base + '/mcp', state: 'state-test' };
+  await t.test('only ChatGPT callbacks can register', async () => {
+    const bad = await fetch(base + '/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ redirect_uris: ['https://attacker.example/cb'], token_endpoint_auth_method: 'none', grant_types: ['authorization_code'], response_types: ['code'] }) });
+    assert.equal(bad.status, 400);
+    const ok = await fetch(base + '/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ redirect_uris: ['https://chatgpt.com/connector/oauth/callback123'], token_endpoint_auth_method: 'none', grant_types: ['authorization_code', 'refresh_token'], response_types: ['code'], client_name: 'ChatGPT' }) });
+    assert.equal(ok.status, 201);
+    assert.equal((await ok.json()).token_endpoint_auth_method, 'none');
+  });
   await t.test('unregistered callback rejected', async () => {
     const r = await fetch(base + '/authorize?' + new URLSearchParams({ ...params, redirect_uri: 'https://attacker.example/cb' }), { redirect: 'manual' }); assert.equal(r.status, 400);
   });

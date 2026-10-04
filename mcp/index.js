@@ -16,7 +16,7 @@ export function createMcpHandler({ handleApi, withOwner, env = process.env }) {
   if (origin.protocol !== 'https:' && !local) throw new Error('MCP_PUBLIC_URL requires HTTPS.');
   if (env.BASE_PATH && env.BASE_PATH !== '/') throw new Error('MCP integration currently requires BASE_PATH empty.');
   // cPanel/Passenger canonicalizes extensionless paths with a trailing slash.
-  const config = { resource: origin.origin + '/mcp/', secure: origin.protocol === 'https:',
+  const config = { resource: origin.origin + '/mcp', secure: origin.protocol === 'https:',
     clientId: env.MCP_CLIENT_ID || 'gejemuzik-chatgpt', clientSecret: env.MCP_CLIENT_SECRET || '',
     loginSecret: env.MCP_LOGIN_SECRET || '', autoApprove: env.MCP_AUTO_APPROVE === 'true',
     redirects: String(env.MCP_REDIRECT_URIS || '').split(',').map(s => s.trim()).filter(Boolean) };
@@ -35,7 +35,7 @@ export function createMcpHandler({ handleApi, withOwner, env = process.env }) {
   const journalPath = env.MCP_JOURNAL_PATH || (env.VERCEL ? 'neon' : fileURLToPath(new URL('../.mcp-journal.json', import.meta.url)));
   const registry = createToolRegistry(api, journalPath, env.MCP_OWNER_ID);
   const app = express(); app.disable('x-powered-by');
-  // Rate limits use the direct peer, not untrusted forwarded headers.
+  // Vercel is the only trusted proxy hop, so rate limits see the client address.
   const { provider, login } = createAuth(config);
   app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-store'); res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -47,7 +47,12 @@ export function createMcpHandler({ handleApi, withOwner, env = process.env }) {
     next();
   });
   app.post('/mcp-login', express.urlencoded({ extended: false, limit: '4kb' }), login);
-  app.use(mcpAuthRouter({ provider, issuerUrl: origin, resourceServerUrl: new URL(config.resource), scopesSupported: ['music:read', 'music:write'], resourceName: 'GEJEMUZIK' }));
+  app.set('trust proxy', 1);
+  app.use(mcpAuthRouter({
+    provider, issuerUrl: origin, resourceServerUrl: new URL(config.resource),
+    scopesSupported: ['music:read', 'music:write'], resourceName: 'GEJEMUZIK',
+    clientRegistrationOptions: { clientSecretExpirySeconds: 0 },
+  }));
   const auth = requireBearerAuth({ verifier: provider, resourceMetadataUrl: getOAuthProtectedResourceMetadataUrl(new URL(config.resource)) });
   app.post(['/mcp', '/mcp/'], auth, express.json({ limit: '64kb' }), async (req, res) => {
     const server = new McpServer({ name: 'gejemuzik', version: '1.0.0' }, { instructions: 'Gunakan bahasa Indonesia. Baca model dan estimasi kredit sebelum tindakan berbayar. Minta persetujuan, lalu pakai UUID request_id unik. Hasil processing bukan kegagalan: simpan song.id dan cek get_job_status. Jangan otomatis mengulang operasi berbayar dengan ID baru. Koleksi terikat ke satu pemilik yang dipasang administrator.' });
@@ -59,6 +64,6 @@ export function createMcpHandler({ handleApi, withOwner, env = process.env }) {
   });
   app.all(['/mcp', '/mcp/'], auth, (req, res) => { res.setHeader('Allow', 'POST'); res.status(405).end(); });
   app.use((err, req, res, next) => { if (!res.headersSent) res.status(err.status === 413 ? 413 : 400).json({ error: 'Invalid request' }); });
-  const paths = new Set(['/mcp', '/mcp/', '/mcp-login', '/authorize', '/token', '/revoke', '/.well-known/oauth-authorization-server', '/.well-known/oauth-protected-resource', '/.well-known/oauth-protected-resource/mcp']);
+  const paths = new Set(['/mcp', '/mcp/', '/mcp-login', '/authorize', '/token', '/revoke', '/register', '/.well-known/oauth-authorization-server', '/.well-known/oauth-protected-resource', '/.well-known/oauth-protected-resource/mcp']);
   return { matches: path => paths.has(path), handle: app };
 }

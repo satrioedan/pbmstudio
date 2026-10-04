@@ -69,8 +69,8 @@ Mengikuti dokumentasi OpenAI yang diperiksa 6 September 2026; penempatan menu da
 
 1. Aktifkan Developer mode melalui Settings → Security and login jika tersedia.
 2. Di Plugins, pilih tambah koneksi/developer-mode app.
-3. Nama: `GEJEMUZIK`; URL: `https://lagu.bangalimin.com/mcp`; autentikasi: **OAuth**.
-4. Masukkan kredensial OAuth statis: Client ID sesuai `MCP_CLIENT_ID`, Client Secret sesuai `MCP_CLIENT_SECRET`. Server ini menggunakan klien terdaftar statis, bukan DCR/CIMD. Metadata mengiklankan client_secret_post dan PKCE S256.
+3. Nama: `GEJEMUZIK`; URL: `https://lagu.bangalimin.com/mcp`; autentikasi: **OAuth**. Jangan buka URL itu di browser: respons `Missing Authorization header` adalah tantangan login yang normal.
+4. Biarkan Client ID dan Client Secret kosong. ChatGPT mendaftar sendiri lewat `/register`. Jika formulir mewajibkan kredensial statis, pakai `MCP_CLIENT_ID` dan `MCP_CLIENT_SECRET`.
 5. Saat halaman persetujuan GEJEMUZIK terbuka, masukkan `MCP_LOGIN_SECRET` dan izinkan koneksi. Ini berbeda dari Client Secret dan kunci provider.
 6. Aktifkan koneksi dalam percakapan dan mulai dengan “Tampilkan model musik yang tersedia” serta “Tampilkan koleksi lagu saya.”
 7. Setelah deploy perubahan tools, refresh metadata koneksi. Setelah restart server, sambungkan/login ulang karena token lama tidak bertahan antar-restart.
