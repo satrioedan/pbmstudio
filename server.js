@@ -1357,13 +1357,17 @@ async function handleApi(req, res, url) {
   }
   if (method === "POST" && pathname === "/api/crun-keys/check") {
     const raw = store.getCrunRawKeys()
+    const errors = []
     await Promise.all(raw.map(async ({ id, key }) => {
       try { store.updateCrunKeyCredits(id, await crunProvider.checkCredits(key)) }
-      catch { /* saldo terakhir tetap dipakai jika cek gagal */ }
+      catch (e) { errors.push(String(e.message || "Saldo crun.ai tidak terbaca").slice(0, 160)) }
     }))
+    if (raw.length) await flushStore()
     const keys = store.listCrunKeys()
-    const totalCredits = sumCredits(keys)
-    return sendJson(res, 200, { keys, count: keys.length, totalCredits })
+    const body = { keys, count: keys.length, totalCredits: sumCredits(keys), failed: errors.length }
+    if (!raw.length) return sendJson(res, 200, { ...body, error: "Belum ada API key crun.ai" })
+    if (errors.length === raw.length) return sendJson(res, 502, { error: errors[0], ...body })
+    return sendJson(res, 200, body)
   }
   if (method === "DELETE" && pathname === "/api/crun-keys") {
     store.deleteAllCrunKeys()
@@ -1376,7 +1380,7 @@ async function handleApi(req, res, url) {
     const entry = store.getCrunKeyById(keyId)
     if (!entry) return sendJson(res, 404, { error: "crun.ai key tidak ditemukan" })
     if (method === "POST" && sub === "/check") {
-      try { const credits = await crunProvider.checkCredits(entry.key); store.updateCrunKeyCredits(keyId, credits); return sendJson(res, 200, { id: keyId, credits }) }
+      try { const credits = await crunProvider.checkCredits(entry.key); store.updateCrunKeyCredits(keyId, credits); await flushStore(); return sendJson(res, 200, { id: keyId, credits }) }
       catch (e) { return sendJson(res, 502, { error: e.message }) }
     }
     if (method === "GET" && sub === "/reveal") return sendJson(res, 200, { id: keyId, key: entry.key })

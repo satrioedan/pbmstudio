@@ -44,7 +44,10 @@ export function createToolRegistry(api, journalPath, ownerId) {
   async function song(songId) { return (await api('GET', `/api/songs/${encodeURIComponent(songId)}`)).song; }
   const songPath = (a, suffix = '') => `/api/songs/${encodeURIComponent(a.song_id)}${suffix}`;
   add('list_models', 'Daftar model dan perkiraan kredit dari katalog situs. Harga aktual mengikuti provider.', {}, () => api('GET', '/api/models'));
-  add('get_credits', 'Saldo virtual situs untuk pemilik terpasang; bukan verifikasi saldo live KIE/MusicAPI.', {}, () => api('GET', '/api/credits'));
+  add('get_credits', 'Saldo live crun.ai milik browser terpasang, plus saldo virtual situs. KIE dan MusicAPI tidak dicek live.', {}, async () => {
+    const [virtual, crun] = await Promise.all([api('GET', '/api/credits'), api('POST', '/api/crun-keys/check')]);
+    return { virtual, crun: { totalCredits: crun.totalCredits ?? 0, count: crun.count ?? 0, failed: crun.failed || 0, keys: (crun.keys || []).map(k => ({ masked: k.masked, credits: k.credits })) } };
+  });
   add('list_tracks', 'Daftar koleksi musik pemilik, maksimal 100 lagu per halaman.', { liked: z.boolean().optional(), offset: z.number().int().min(0).default(0), limit: z.number().int().min(1).max(100).default(20) }, async a => {
     const { songs } = await api('GET', `/api/songs?liked=${a.liked === true}`);
     return { songs: songs.slice(a.offset, a.offset + a.limit), total: songs.length, next_offset: a.offset + a.limit < songs.length ? a.offset + a.limit : null };

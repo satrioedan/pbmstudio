@@ -406,6 +406,10 @@ export const crunProvider = {
   async checkCredits(key) {
     const r = await call("/api/v1/client/account/balance", key)
     if (!r.ok) throw new Error(r.code === 401 ? "Key tidak valid" : r.code === 403 ? "Key nonaktif" : errorMessage(r.data, r.code))
-    return Number(r.data?.data?.balance ?? 0)
+    const body = r.data?.data && typeof r.data.data === "object" ? r.data.data : r.data
+    const value = body?.balance ?? body?.credits ?? body?.credit ?? body?.remaining
+    const credits = Number(value)
+    if (!Number.isFinite(credits)) throw new Error("Saldo crun.ai tidak terbaca")
+    return credits
   },
 }

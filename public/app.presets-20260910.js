@@ -743,7 +743,7 @@ function setView(view) {
   if (isFp) renderBlocks() // Refresh blocks setiap lihat frontpage
   if (view === "library") loadSongs(false).catch(() => {})
   if (view === "liked") loadSongs(true).catch(() => {})
-  if (view === "settings") { loadKeys().catch(() => {}); loadUploadKeys().catch(() => {}); loadGeminiKeys().catch(() => {}); loadKieKeys().catch(() => {}); loadMusicApiKeys().catch(() => {}); loadCrunKeys().catch(() => {}) }
+  if (view === "settings") { loadKeys().catch(() => {}); loadUploadKeys().catch(() => {}); loadGeminiKeys().catch(() => {}); loadKieKeys().catch(() => {}); loadMusicApiKeys().catch(() => {}); loadCrunKeys().then(refreshLiveCrunCredits).catch(() => {}) }
   if (view === "mastering") populateMasteringSongSelect()
 }
 
@@ -1611,12 +1611,20 @@ async function loadMusicApiKeys() {
   list.innerHTML = d.keys.length ? d.keys.map((k) => keyItemHtml(k, "musicapi")).join("") : '<li class="empty">Belum ada key.</li>'
   bindKeyItems(list, "musicapi")
 }
-async function loadCrunKeys() {
-  const d = await api("/api/crun-keys")
+function renderCrunKeys(d) {
   $("#crunkeys-summary").textContent = keySummary(d)
   const list = $("#crunkeys-list")
   list.innerHTML = d.keys.length ? d.keys.map((k) => keyItemHtml(k, "crun")).join("") : '<li class="empty">Belum ada key.</li>'
   bindKeyItems(list, "crun")
+}
+async function loadCrunKeys() {
+  renderCrunKeys(await api("/api/crun-keys"))
+}
+async function refreshLiveCrunCredits() {
+  const r = await api("/api/crun-keys/check", { method: "POST" })
+  renderCrunKeys(r)
+  refreshCredits()
+  return r
 }
 
 // ------------------------------ Generate Lirik (Gemini) ---------------------
@@ -1827,7 +1835,10 @@ function bindUIInner() {
   })
   $("#crunkeys-check").addEventListener("click", async () => {
     toast("Mengecek saldo crun.ai\u2026", "info")
-    try { await api("/api/crun-keys/check", { method: "POST" }); loadCrunKeys(); toast("Cek crun.ai selesai", "success") } catch (e) { toast(e.message, "error") }
+    try {
+      const r = await refreshLiveCrunCredits()
+      toast(r.failed ? `${r.totalCredits ?? 0} kredit terbaca, ${r.failed} key gagal` : `Saldo crun.ai ${r.totalCredits ?? 0} kredit`, r.failed ? "warning" : "success")
+    } catch (e) { toast(e.message, "error") }
   })
   // Search & sort
   $("#lib-search").addEventListener("input", (e) => {
