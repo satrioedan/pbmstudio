@@ -673,6 +673,7 @@ async function api(path, opts = {}) {
   })
   let data = null
   try { data = await res.json() } catch { data = null }
+  if (res.status === 413) throw new Error("File terlalu besar untuk dikirim sekaligus. Gunakan file di bawah 10 MB.")
   if (!res.ok) throw new Error((data && data.error) || ("HTTP " + res.status))
   return data
 }
@@ -1211,6 +1212,22 @@ function fileToBase64(file) {
     r.readAsDataURL(file)
   })
 }
+async function uploadCoverFile(file) {
+  const chunkBytes = 1536 * 1024
+  if (file.size <= 2 * 1024 * 1024) {
+    const dataUrl = await fileToBase64(file)
+    return { base64Data: String(dataUrl).replace(/^data:[^;]+;base64,/, "") }
+  }
+  const sessionId = crypto.randomUUID()
+  const total = Math.ceil(file.size / chunkBytes)
+  for (let index = 0; index < total; index++) {
+    const piece = file.slice(index * chunkBytes, Math.min(file.size, (index + 1) * chunkBytes))
+    const chunk = await blobToBase64(piece)
+    await api("/api/upload-chunks", { method: "POST", body: { sessionId, index, total, fileName: file.name, chunk } })
+    $("#upload-msg").textContent = "Mengunggah " + (index + 1) + "/" + total + "\u2026"
+  }
+  return { uploadSessionId: sessionId }
+}
 async function submitUpload() {
   const btn = $("#btn-upload")
   const file = $("#u-file").files[0]
@@ -1227,15 +1244,18 @@ async function submitUpload() {
     return
   }
   
+  if (file.size > 10 * 1024 * 1024) {
+    toast("File maksimal 10 MB", "error")
+    return
+  }
+
   btn.disabled = true
   $("#upload-msg").textContent = "Mengunggah\u2026"
   
   try {
-    const dataUrl = await fileToBase64(file)
-    const base64Data = String(dataUrl).replace(/^data:[^;]+;base64,/, "")
-    
+    const uploaded = await uploadCoverFile(file)
     const body = {
-      base64Data, 
+      ...uploaded,
       fileName: file.name,
       title: $("#u-title").value.trim(),
       style: style,

@@ -22,6 +22,7 @@ import { kieUploadCover } from "./kieCover.presets-20260910.js"
 import { kieProvider } from "./kieProvider.presets-20260910.js"
 import { musicapiProvider } from "./musicapiProvider.js"
 import { crunProvider } from "./crunProvider.js"
+import { saveUploadChunk, takeUploadSession } from "./lib/uploadChunks.js"
 import { store, withOwner, storeReady, flushStore, beginRequest, endRequest } from "./store.js"
 
 // BASE_PATH: dukungan pemasangan di sub-path (mis. https://host/evo/).
@@ -335,12 +336,39 @@ async function handleApi(req, res, url) {
     return sendJson(res, 201, { song, credits: store.getAllCredits() })
   }
 
+  // POST /api/upload-chunks -> potongan file di bawah batas body Vercel (4,5 MB)
+  if (method === "POST" && pathname === "/api/upload-chunks") {
+    const body = await readBody(req, 4e6)
+    try {
+      await saveUploadChunk({
+        sessionId: body.sessionId,
+        index: Number(body.index),
+        total: Number(body.total),
+        fileName: body.fileName,
+        chunk: body.chunk,
+        ownerId: getOwnerId(req, res),
+      })
+      return sendJson(res, 200, { ok: true })
+    } catch (e) {
+      return sendJson(res, 400, { error: e.message })
+    }
+  }
+
   // POST /api/upload-cover  -> upload audio dari galeri lalu aransemen ulang
   // Upload Cover: SunoAPI or KIE AI
   if (method === "POST" && pathname === "/api/upload-cover") {
     const body = await readBody(req, UPLOAD_MAX_BYTES)
-    const base64Data = (body.base64Data || "").toString()
-    const fileName = (body.fileName || "").toString().slice(0, 120)
+    let base64Data = (body.base64Data || "").toString()
+    let fileName = (body.fileName || "").toString().slice(0, 120)
+    if (body.uploadSessionId) {
+      try {
+        const uploaded = await takeUploadSession(String(body.uploadSessionId), getOwnerId(req, res))
+        base64Data = uploaded.base64Data
+        fileName = fileName || uploaded.fileName
+      } catch (e) {
+        return sendJson(res, 400, { error: e.message })
+      }
+    }
     const style = (body.style || "").toString().slice(0, LIMITS.style)
     const prompt = (body.prompt || "").toString().slice(0, LIMITS.lyrics)
     const title = (body.title || "").toString().slice(0, LIMITS.title)
