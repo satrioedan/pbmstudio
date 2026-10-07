@@ -75,14 +75,29 @@ function normalizeTrack(t = {}, i = 0) {
   }
 }
 
+function fileId(url) {
+  const match = String(url || "").match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i)
+  return match ? match[0].toLowerCase() : ""
+}
+
+// audiostream.kie.ai membalas HTTP 200 audio/mpeg, tetapi bodinya kosong.
+function isEmptyStreamUrl(url) {
+  try { return new URL(url).host === "audiostream.kie.ai" } catch { return false }
+}
+
 function parseTracks(task) {
   const result = task?.result || {}
   let arr = result.suno_data || []
   if (!Array.isArray(arr)) arr = [arr]
-  arr = arr.map(normalizeTrack).filter((t) => t.audioUrl)
-  if (!arr.length && Array.isArray(result.media_urls)) {
-    arr = result.media_urls.filter((u) => typeof u === "string").map((u, i) => normalizeTrack({ audio_url: u }, i))
-  }
+  const files = (Array.isArray(result.media_urls) ? result.media_urls : []).filter((u) => typeof u === "string" && /^https?:\/\//.test(u))
+  const fileById = new Map(files.map((u) => [fileId(u), u]))
+  arr = arr.map((t, i) => {
+    const track = normalizeTrack(t, i)
+    const fileUrl = fileById.get(fileId(track.audioUrl)) || files[i] || null
+    if (fileUrl && (!track.audioUrl || isEmptyStreamUrl(track.audioUrl))) track.audioUrl = fileUrl
+    return track
+  }).filter((t) => t.audioUrl)
+  if (!arr.length && files.length) arr = files.map((u, i) => normalizeTrack({ audio_url: u }, i))
   const first = arr[0] || {}
   return { audioUrl: first.audioUrl || null, imageUrl: first.imageUrl || null, tracks: arr }
 }

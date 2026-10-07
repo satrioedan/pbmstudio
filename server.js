@@ -813,7 +813,25 @@ async function handleApi(req, res, url) {
       if (song.wavUrl) allowed.add(song.wavUrl)
       if (song.videoUrl) allowed.add(song.videoUrl)
       if (Array.isArray(song.stems)) for (const s of song.stems) if (s && s.url) allowed.add(s.url)
-      if (!src || !allowed.has(src)) return sendJson(res, 400, { error: "Sumber audio tidak valid untuk lagu ini" })
+      const requestedFileId = (src.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i) || [])[0]?.toLowerCase() || ""
+      const storedFileUrl = [song.audioUrl, ...(Array.isArray(song.tracks) ? song.tracks.map((t) => t?.audioUrl) : [])]
+        .find((u) => requestedFileId && String(u || "").toLowerCase().includes(requestedFileId) && !/\/\/audiostream\.kie\.ai\//.test(String(u || "")))
+      if (!src || (!allowed.has(src) && !storedFileUrl)) return sendJson(res, 400, { error: "Sumber audio tidak valid untuk lagu ini" })
+      let playSrc = storedFileUrl || src
+      if (!storedFileUrl && song.provider === "crun" && /\/\/audiostream\.kie\.ai\//.test(src)) {
+        try {
+          const st = await crunProvider.getStatus(song.providerJobId, song.providerKeyId)
+          const replacement = (st.tracks || []).find((t) => t?.audioUrl && !/\/\/audiostream\.kie\.ai\//.test(t.audioUrl) && (!requestedFileId || t.audioUrl.toLowerCase().includes(requestedFileId)))
+          if (replacement?.audioUrl) {
+            playSrc = replacement.audioUrl
+            store.updateSong(id, {
+              audioUrl: song.audioUrl === src ? playSrc : song.audioUrl,
+              tracks: (song.tracks || []).map((t) => t?.audioUrl === src ? { ...t, audioUrl: playSrc } : t),
+            })
+            await flushStore()
+          }
+        } catch { /* stream lama tetap dicoba */ }
+      }
       const safeTitle = (song.title || "track").replace(/[^\w.-]+/g, "_").slice(0, 60) || "track"
 
       const extM = src.toLowerCase().match(/\.(mp3|wav|m4a|flac|ogg|aac|mp4)(?:[?#]|$)/)
@@ -859,12 +877,15 @@ async function handleApi(req, res, url) {
         }
         // Range tidak diteruskan. CDN sering menolaknya atau membalas 200, lalu browser
         // gagal memutar ulang karena mengharapkan 206. Putar ulang mengunduh file utuh lagi.
-        upstream = await fetch(src, { headers, redirect: "follow" })
+        upstream = await fetch(playSrc, { headers, redirect: "follow" })
       }
       catch (e) { return sendJson(res, 502, { error: "Gagal mengambil sumber: " + e.message }) }
 
       if (!upstream.ok || !upstream.body) {
         return sendJson(res, 502, { error: "Sumber audio tidak bisa diambil: HTTP " + upstream.status })
+      }
+      if (upstream.headers.get("content-length") === "0") {
+        return sendJson(res, 502, { error: "Sumber audio kosong" })
       }
 
       const ctype = upstream.headers.get("content-type") || fallbackType
