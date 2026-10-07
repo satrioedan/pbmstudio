@@ -64,7 +64,7 @@ export function createMcpHandler({ handleApi, withOwner, env = process.env }) {
   }));
   const auth = requireBearerAuth({ verifier: provider, resourceMetadataUrl: getOAuthProtectedResourceMetadataUrl(new URL(config.resource)) });
   app.post(['/mcp', '/mcp/'], auth, express.json({ limit: '64kb' }), async (req, res) => {
-    const server = new McpServer({ name: 'gejemuzik', version: '1.0.0' }, { instructions: 'Gunakan bahasa Indonesia. Baca model dan estimasi kredit sebelum tindakan berbayar. get_credits membaca saldo live crun.ai browser terpasang. Minta persetujuan, lalu pakai UUID request_id unik. Hasil processing bukan kegagalan: simpan song.id dan cek get_job_status. Jangan otomatis mengulang operasi berbayar dengan ID baru. Koleksi terikat ke satu pemilik yang dipasang administrator.' });
+    const server = new McpServer({ name: 'gejemuzik', version: '1.0.0' }, { instructions: 'Gunakan bahasa Indonesia. Baca model dan estimasi kredit sebelum tindakan berbayar. get_credits membaca saldo live crun.ai browser terpasang. add_vocals menambah lirik ke instrumental lewat KIE. Minta persetujuan, lalu pakai UUID request_id unik. Hasil processing bukan kegagalan: simpan song.id dan cek get_job_status. Jangan otomatis mengulang operasi berbayar dengan ID baru. Koleksi terikat ke satu pemilik yang dipasang administrator.' });
     registry.register(server);
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
     res.on('close', () => { transport.close().catch(() => {}); server.close().catch(() => {}); });

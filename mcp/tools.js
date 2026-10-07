@@ -55,6 +55,11 @@ export function createToolRegistry(api, journalPath, ownerId) {
   add('get_job_status', 'Cek status lagu/stem/WAV sekali, termasuk URL hasil. Jika processing, periksa lagi kemudian; jangan mengirim ulang generate.', { song_id: id }, a => api('GET', songPath(a)));
   add('generate_lyrics', 'Buat lirik memakai Gemini situs; dapat memakai kuota/biaya API. Minta persetujuan dahulu.', { ...paid, theme: text(500).min(1), language: text(60).default('Indonesia'), genre: text(120).optional(), mood: text(120).optional(), structure: text(200).optional(), extra: text(500).optional(), model: text(60).optional() }, a => api('POST', '/api/lyrics/generate', a), true);
   add('create_song', 'Buat lagu AI. Baca list_models, jelaskan model dan estimasi kredit, minta persetujuan. Hasil awal berisi song.id untuk get_job_status.', { ...paid, model: text(60).min(1), style: text(1000).min(1), title: text(80).optional(), lyrics: text(5000).optional(), type: z.enum(['vocal', 'instrumental']).default('vocal'), vocalGender: z.enum(['male', 'female', 'auto']).default('auto') }, a => api('POST', '/api/songs', a), true);
+  add('add_vocals', 'Tambah lirik ke lagu instrumental yang sudah selesai lewat KIE. Hasilnya lagu vokal baru; file asli tidak diubah. Memakai kredit akun KIE, bukan kredit virtual situs. Audio sebaiknya di bawah 8 menit.', { ...paid, song_id: id, lyrics: text(5000).min(1), style: text(1000).min(1), title: text(80).optional(), vocalGender: z.enum(['male', 'female', 'auto']).default('auto') }, async a => {
+    const s = await song(a.song_id);
+    if (s.status !== 'success' || s.type === 'vocal') throw new Error('Tambah lirik hanya untuk lagu instrumental yang sudah selesai.');
+    return api('POST', songPath(a, '/add-vocals'), a);
+  }, true);
   add('remix_audio', 'Aransemen ulang lagu APIframe selesai, estimasi 11 kredit virtual APIframe. Provider lain tidak didukung endpoint ini.', { ...paid, song_id: id, style: text(1000).min(1), prompt: text(5000).optional(), title: text(80).optional(), index: z.union([z.literal(1), z.literal(2)]).default(1), negativeTags: text(500).optional(), audioWeight: z.number().min(0).max(1).optional() }, async a => {
     const s = await song(a.song_id); if (s.provider !== 'apiframe') throw new Error('Aransemen melalui MCP ini hanya mendukung lagu APIframe.');
     return api('POST', songPath(a, '/cover'), a);

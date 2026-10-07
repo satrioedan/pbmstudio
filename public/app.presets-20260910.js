@@ -813,7 +813,7 @@ async function loadSongs(liked) {
 
 function songCardHtml(s) {
   const cover = s.imageUrl || "/icon-192.png"
-  const kind = s.isMastered ? "Mastering" : s.isUpload ? "Upload" : s.isExtend ? "Perpanjangan" : s.isCover ? "Aransemen" : s.provider === "kie" ? "KIE AI" : s.provider === "musicapi" ? "MusicAPI" : s.provider === "crun" ? "crun.ai" : (s.provider === "uploadcover" ? "sunoapi" : s.provider === "mastering" ? "Mastering" : "APIframe")
+  const kind = s.isAddVocals ? "Tambah Lirik" : s.isMastered ? "Mastering" : s.isUpload ? "Upload" : s.isExtend ? "Perpanjangan" : s.isCover ? "Aransemen" : s.provider === "kie" ? "KIE AI" : s.provider === "musicapi" ? "MusicAPI" : s.provider === "crun" ? "crun.ai" : (s.provider === "uploadcover" ? "sunoapi" : s.provider === "mastering" ? "Mastering" : "APIframe")
   const canPlay = s.status === "success" && Boolean(firstAudioSrc(s))
   const isFailed = s.status === "failed"
   const isBusy = s.status === "processing" || s.status === "queued"
@@ -1339,7 +1339,7 @@ function setActiveTrack(src, imageUrl) {
 }
 function renderDetail(song) {
   state.selected = song
-  const kind = song.isUpload ? "\uD83C\uDF99\uFE0F Upload & Cover" : song.isExtend ? "Perpanjangan" : song.isCover ? "\uD83C\uDFB8 Aransemen Ulang" : song.provider === "crun" ? "crun.ai" : (song.provider === "uploadcover" ? "sunoapi.org" : "APIframe")
+  const kind = song.isAddVocals ? "Tambah Lirik" : song.isUpload ? "\uD83C\uDF99\uFE0F Upload & Cover" : song.isExtend ? "Perpanjangan" : song.isCover ? "\uD83C\uDFB8 Aransemen Ulang" : song.provider === "crun" ? "crun.ai" : (song.provider === "uploadcover" ? "sunoapi.org" : "APIframe")
   $("#d-kind").textContent = kind
   $("#d-title").textContent = song.title
   $("#d-style").textContent = song.style || song.modelLabel || ""
@@ -1369,6 +1369,7 @@ function renderDetail(song) {
   $("#btn-cover").disabled = song.status !== "success" || song.provider === "uploadcover"
   $("#btn-stem").disabled = song.status !== "success"
   ensureCrunActions(song)
+  ensureLyricsAction(song)
 
   renderStemWav(song)
 }
@@ -1489,6 +1490,95 @@ function ensureCrunActions(song) {
   const vidBtn = $("#btn-video")
   if (extBtn) { extBtn.style.display = show ? "" : "none"; extBtn.disabled = !show || song.status !== "success" }
   if (vidBtn) { vidBtn.style.display = show ? "" : "none"; vidBtn.disabled = !show || song.status !== "success" || song.videoStatus === "processing" }
+}
+function instrumentalSong(song) {
+  if (!song || song.status !== "success" || !firstAudioSrc(song)) return false
+  if (song.type === "instrumental") return true
+  return song.type !== "vocal" && !String(song.lyrics || "").trim()
+}
+function ensureLyricsAction(song) {
+  const bar = document.querySelector(".detail-actions")
+  if (bar && !$("#btn-add-vocals")) {
+    const btn = document.createElement("button")
+    btn.id = "btn-add-vocals"
+    btn.className = "btn-secondary"
+    btn.type = "button"
+    btn.textContent = "Tambah Lirik"
+    const cover = $("#btn-cover")
+    if (cover) cover.after(btn)
+    else bar.prepend(btn)
+    btn.addEventListener("click", openAddVocals)
+  }
+  const btn = $("#btn-add-vocals")
+  const show = instrumentalSong(song)
+  if (btn) { btn.style.display = show ? "" : "none"; btn.disabled = !show }
+}
+function ensureLyricsModal() {
+  if ($("#lyrics-modal")) return
+  const el = document.createElement("div")
+  el.id = "lyrics-modal"
+  el.className = "modal hidden"
+  el.innerHTML = `<div class="modal-card sm" role="dialog" aria-labelledby="lyrics-heading">
+    <button class="modal-close" id="lyrics-close" type="button" aria-label="Tutup">\u2715</button>
+    <h3 id="lyrics-heading">Tambah Lirik</h3>
+    <p class="muted small">KIE AI membuat lagu vokal baru dari instrumental ini. File asli tidak diubah. Proses memakai kredit KIE, bukan kredit situs. Audio sebaiknya di bawah 8 menit.</p>
+    <label class="hf-label" for="lyrics-title">Judul</label>
+    <input id="lyrics-title" maxlength="80" />
+    <label class="hf-label" for="lyrics-style">Gaya</label>
+    <input id="lyrics-style" maxlength="1000" />
+    <label class="hf-label" for="lyrics-text">Lirik</label>
+    <textarea id="lyrics-text" rows="8" maxlength="5000" placeholder="[Verse]&#10;Tulis lirik di sini"></textarea>
+    <label class="hf-label" for="lyrics-gender">Suara</label>
+    <select id="lyrics-gender"><option value="auto">Otomatis</option><option value="female">Wanita</option><option value="male">Pria</option></select>
+    <div class="actions">
+      <button id="lyrics-go" class="btn-primary" type="button">Buat vokal</button>
+      <button id="lyrics-cancel" class="btn-text" type="button">Batal</button>
+    </div>
+    <p class="muted small" id="lyrics-status"></p>
+  </div>`
+  document.body.appendChild(el)
+  $("#lyrics-close").addEventListener("click", closeAddVocals)
+  $("#lyrics-cancel").addEventListener("click", closeAddVocals)
+  $("#lyrics-go").addEventListener("click", submitAddVocals)
+  el.addEventListener("click", (e) => { if (e.target === el) closeAddVocals() })
+}
+function openAddVocals() {
+  if (!instrumentalSong(state.selected)) return
+  ensureLyricsModal()
+  const song = state.selected
+  $("#lyrics-title").value = (song.title || "Instrumental") + " (Vokal)"
+  $("#lyrics-style").value = song.style || ""
+  $("#lyrics-text").value = ""
+  $("#lyrics-gender").value = song.vocalGender === "male" || song.vocalGender === "female" ? song.vocalGender : "auto"
+  $("#lyrics-status").textContent = ""
+  $("#lyrics-modal").classList.remove("hidden")
+}
+function closeAddVocals() { $("#lyrics-modal")?.classList.add("hidden") }
+async function submitAddVocals() {
+  if (!state.selected) return
+  const lyrics = $("#lyrics-text").value.trim()
+  const style = $("#lyrics-style").value.trim()
+  const title = $("#lyrics-title").value.trim()
+  if (!lyrics) { $("#lyrics-status").textContent = "Lirik wajib diisi"; return }
+  if (!style) { $("#lyrics-status").textContent = "Gaya wajib diisi"; return }
+  $("#lyrics-go").disabled = true
+  $("#lyrics-status").textContent = "Mengirim ke KIE\u2026"
+  try {
+    const { song } = await api("/api/songs/" + state.selected.id + "/add-vocals", {
+      method: "POST",
+      body: { lyrics, style, title, vocalGender: $("#lyrics-gender").value },
+    })
+    closeAddVocals()
+    toast("Vokal diproses. Lagu baru muncul di koleksi.", "success")
+    setView("library")
+    startPoll(song.id)
+    openDetail(song.id)
+  } catch (e) {
+    $("#lyrics-status").textContent = e.message
+    toast(e.message, "error")
+  } finally {
+    $("#lyrics-go").disabled = false
+  }
 }
 async function doExtend() {
   if (!state.selected) return

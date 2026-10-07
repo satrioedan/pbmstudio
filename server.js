@@ -132,6 +132,19 @@ function boostLyricsLocally(lyrics, title, style) {
   ].join("\n").slice(0, 5000)
 }
 
+function isEmptyStream(url) { return /\/\/audiostream\.kie\.ai\//.test(String(url || "")) }
+async function sourceAudioUrl(song) {
+  const stored = [song.audioUrl, ...(Array.isArray(song.tracks) ? song.tracks.map((t) => t?.audioUrl) : [])].filter(Boolean)
+  const direct = stored.find((url) => !isEmptyStream(url))
+  if (direct) return direct
+  if (song.provider === "crun" && song.providerJobId) {
+    const st = await crunProvider.getStatus(song.providerJobId, song.providerKeyId)
+    const file = (st.tracks || []).find((t) => t?.audioUrl && !isEmptyStream(t.audioUrl))
+    if (file?.audioUrl) return file.audioUrl
+  }
+  if (stored.length) throw new Error("Audio sumber kosong, tidak bisa ditambah lirik")
+  return null
+}
 function sumCredits(keys) {
   return (Array.isArray(keys) ? keys : []).reduce((sum, key) => {
     if (key.credits === null || key.credits === undefined || key.credits === "") return sum
@@ -464,7 +477,7 @@ async function handleApi(req, res, url) {
   }
 
   // Routes dengan :id
-  const idMatch = pathname.match(/^\/api\/songs\/([^/]+)(\/like|\/cover|\/stems|\/wav|\/download|\/stream|\/retry|\/extend|\/video)?$/)
+  const idMatch = pathname.match(/^\/api\/songs\/([^/]+)(\/like|\/cover|\/stems|\/wav|\/download|\/stream|\/retry|\/extend|\/video|\/add-vocals)?$/)
   if (idMatch) {
     const id = idMatch[1]
     const sub = idMatch[2] || ""
@@ -801,6 +814,45 @@ async function handleApi(req, res, url) {
       return sendJson(res, 201, { song: extended, credits: store.getAllCredits() })
     }
 
+    // POST /api/songs/:id/add-vocals -> KIE menambah vokal ke instrumental, hasilnya lagu baru
+    if (method === "POST" && sub === "/add-vocals") {
+      if (song.status !== "success") return sendJson(res, 400, { error: "Lagu harus selesai dulu sebelum ditambah lirik" })
+      if (song.type === "vocal") return sendJson(res, 400, { error: "Tambah lirik hanya untuk lagu instrumental" })
+      if (!kieProvider.hasKey()) return sendJson(res, 400, { error: "Belum ada API key KIE AI. Tambahkan di Setelan API Key bagian KIE AI." })
+      const body = await readBody(req)
+      const lyrics = (body.lyrics || "").toString().trim().slice(0, LIMITS.lyrics)
+      const style = (body.style || song.style || "").toString().trim().slice(0, LIMITS.style)
+      const title = (body.title || `${song.title} (Vokal)`).toString().trim().slice(0, LIMITS.title)
+      const negativeTags = (body.negativeTags || "noise, distortion").toString().trim().slice(0, 200) || "noise, distortion"
+      const vocalGender = ["male", "female", "auto"].includes(body.vocalGender) ? body.vocalGender : (song.vocalGender || "auto")
+      if (!lyrics) return sendJson(res, 400, { error: "Lirik wajib diisi" })
+      if (!style) return sendJson(res, 400, { error: "Gaya wajib diisi" })
+      if (!title) return sendJson(res, 400, { error: "Judul wajib diisi" })
+      const duration = Number(song.duration || song.tracks?.[0]?.duration || 0)
+      if (duration > 480) return sendJson(res, 400, { error: "Audio sumber lebih dari 8 menit, KIE tidak bisa menambah vokal" })
+      let uploadUrl
+      try { uploadUrl = await sourceAudioUrl(song) } catch (e) { return sendJson(res, 400, { error: e.message }) }
+      if (!uploadUrl) return sendJson(res, 400, { error: "Audio sumber tidak ditemukan" })
+      let job
+      try {
+        job = await kieProvider.addVocals({ uploadUrl, title, style, lyrics, negativeTags, vocalGender })
+      } catch (e) {
+        return sendJson(res, 502, { error: "KIE AI gagal: " + e.message })
+      }
+      const now = Date.now()
+      const created = store.addSong({
+        id: randomUUID(),
+        title, lyrics, style, type: "vocal", vocalGender,
+        model: "kie-add-vocals", modelLabel: "KIE Tambah Lirik", credits: 0,
+        status: job.status || "processing",
+        audioUrl: null, imageUrl: song.imageUrl || null, tracks: [], error: null, liked: false,
+        provider: "kie", providerJobId: job.jobId, providerKeyId: job.keyId || null,
+        isAddVocals: true, vocalsOf: song.id, negativeTags,
+        createdAt: now, updatedAt: now,
+      })
+      return sendJson(res, 201, { song: created, credits: store.getAllCredits() })
+    }
+
     // POST /api/songs/:id/video -> video lirik crun.ai, menempel di lagu yang sama
     if (method === "POST" && sub === "/video") {
       if (song.provider !== "crun") return sendJson(res, 400, { error: "Video lewat crun.ai hanya untuk lagu crun.ai" })
@@ -1037,7 +1089,10 @@ async function handleApi(req, res, url) {
       const items = body?.data?.data || body?.data?.response?.sunoData || []
       const song = taskId ? store.getSongByJob(taskId) : null
       if (song && Array.isArray(items) && items.length) {
-        const tracks = items.map((t, i) => ({ id: t.id || String(i + 1), audioUrl: t.audio_url || t.audioUrl || t.streamAudioUrl, imageUrl: t.image_url || t.imageUrl, title: t.title, tags: t.tags, duration: t.duration })).filter((t) => t.audioUrl)
+        const tracks = items.map((t, i) => {
+          const urls = [t.audio_url, t.audioUrl, t.source_audio_url, t.stream_audio_url, t.streamAudioUrl].filter((u) => typeof u === "string" && u.trim())
+          return { id: t.id || String(i + 1), audioUrl: urls.find((u) => !/\/\/audiostream\.kie\.ai\//.test(u)) || urls[0], imageUrl: t.image_url || t.imageUrl, title: t.title, tags: t.tags, duration: t.duration }
+        }).filter((t) => t.audioUrl)
         if (tracks.length) store.applyResult(song.id, { status: "success", audioUrl: tracks[0].audioUrl, imageUrl: tracks[0].imageUrl || song.imageUrl, tracks, error: null })
       }
     } catch { /* abaikan callback malformed */ }
