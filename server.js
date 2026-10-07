@@ -1003,7 +1003,7 @@ async function handleApi(req, res, url) {
           const st = song.provider === "uploadcover"
             ? await uploadCover.getStatus(song.providerJobId, song.providerKeyId)
             : song.provider === "kie"
-              ? await kieProvider.getStatus(song.providerJobId, song.providerKeyId)
+              ? await kieProvider.getStatus(song.providerJobId, song.providerKeyId, { market: !!song.isAddVocals })
               : song.provider === "musicapi"
                 ? await musicapiProvider.getStatus(song.providerJobId, song.providerKeyId)
                 : song.provider === "crun"

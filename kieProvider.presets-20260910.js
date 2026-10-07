@@ -43,15 +43,20 @@ function mapStatus(s) {
     case "CALLBACK_EXCEPTION":
     case "SENSITIVE_WORD_ERROR":
     case "FAILED":
+    case "FAIL":
     case "ERROR": return "failed"
     default: return "processing"
   }
 }
 function firstNonEmpty(...vals) { return vals.find((v) => typeof v === "string" && v.trim()) || null }
+function preferAudio(...vals) {
+  const urls = vals.filter((v) => typeof v === "string" && v.trim())
+  return urls.find((u) => !/\/\/audiostream\.kie\.ai\//.test(u)) || urls[0] || null
+}
 function normalizeTrack(t = {}, i = 0) {
   return {
     id: t.id || t.audioId || t.audio_id || String(i + 1),
-    audioUrl: firstNonEmpty(t.audioUrl, t.audio_url, t.streamAudioUrl, t.stream_audio_url, t.url),
+    audioUrl: preferAudio(t.audioUrl, t.audio_url, t.sourceAudioUrl, t.source_audio_url, t.streamAudioUrl, t.stream_audio_url, t.url),
     imageUrl: firstNonEmpty(t.imageUrl, t.image_url, t.coverUrl, t.thumbnailUrl),
     title: t.title || t.name || null,
     tags: t.tags || null,
@@ -60,8 +65,11 @@ function normalizeTrack(t = {}, i = 0) {
 }
 function parseTracks(data) {
   const d = data?.data || data || {}
-  const response = d.response || data?.response || {}
-  let tracks = response.sunoData || d.sunoData || data?.sunoData || data?.data?.data || []
+  let parsed = {}
+  if (typeof d.resultJson === "string") { try { parsed = JSON.parse(d.resultJson) } catch { parsed = {} } }
+  else if (d.resultJson && typeof d.resultJson === "object") parsed = d.resultJson
+  const response = d.response || data?.response || parsed.response || {}
+  let tracks = response.sunoData || d.sunoData || parsed.sunoData || parsed.data || parsed.resultUrls || data?.sunoData || []
   if (!Array.isArray(tracks)) tracks = [tracks]
   tracks = tracks.map(normalizeTrack).filter((t) => t.audioUrl)
   const first = tracks[0] || {}
@@ -125,7 +133,56 @@ export const kieProvider = {
     }
     throw new Error("Semua API key KIE AI limit atau gagal. " + (lastErr ? lastErr.message : ""))
   },
-  async getStatus(jobId, keyId) {
+  async addVocals({ uploadUrl, title, style, lyrics, negativeTags, vocalGender }) {
+    if (MOCK) return this.generate({ title, lyrics, style, type: "vocal", vocalGender })
+    const pool = poolForGenerate()
+    if (!pool.length) throw new Error("Belum ada API key KIE AI. Tambahkan di Setelan API Key bagian KIE AI.")
+    const input = {
+      upload_url: uploadUrl,
+      title: String(title || "Untitled").slice(0, 80),
+      style: String(style || "Pop").slice(0, 1000),
+      negative_tags: String(negativeTags || "noise, distortion").slice(0, 200),
+      lyrics: String(lyrics || "").slice(0, 5000),
+      prompt: String(lyrics || style || "music").slice(0, 5000),
+      model: "V6",
+    }
+    if (vocalGender === "male") input.vocal_gender = "m"
+    if (vocalGender === "female") input.vocal_gender = "f"
+    const payload = {
+      model: "ai-music-api/add-vocals",
+      callBackUrl: `${PUBLIC_URL}/api/webhooks/kie?t=${WEBHOOK_TOKEN}`,
+      input,
+    }
+    const start = store.getKieKeyCursor ? store.getKieKeyCursor() % pool.length : 0
+    let lastErr = null
+    for (let i = 0; i < pool.length; i++) {
+      const idx = (start + i) % pool.length
+      const { id, key } = pool[idx]
+      let res, data
+      try {
+        res = await fetch(`${BASE_URL}/api/v1/jobs/createTask`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+        data = await res.json().catch(() => ({}))
+      } catch (e) { lastErr = new Error(`KIE ${maskKey(key)}: ${e.message}`); continue }
+      if (res.ok && (data.code == null || Number(data.code) === 200)) {
+        const jobId = data?.data?.taskId || data?.taskId
+        if (!jobId) throw new Error("Respons KIE AI tidak berisi taskId")
+        if (store.setKieKeyCursor) store.setKieKeyCursor((idx + 1) % pool.length)
+        return { jobId, status: "processing", keyId: id }
+      }
+      if (ROTATE_STATUS.has(res.status) || ROTATE_STATUS.has(Number(data.code))) {
+        if ((res.status === 402 || Number(data.code) === 402) && id !== "env") store.updateKieKeyCredits?.(id, 0)
+        lastErr = new Error(`KIE ${maskKey(key)} (${data.code || res.status}): ${data.msg || data.message || "limit/invalid"}`)
+        continue
+      }
+      throw new Error(data.msg || data.message || `KIE AI ${res.status}`)
+    }
+    throw new Error("Semua API key KIE AI limit atau gagal. " + (lastErr ? lastErr.message : ""))
+  },
+  async getStatus(jobId, keyId, options = {}) {
     if (MOCK) {
       const job = mockJobs.get(jobId)
       if (!job) return { status: "failed", error: "Mock job tidak ditemukan" }
@@ -134,15 +191,16 @@ export const kieProvider = {
     }
     const key = resolveKey(keyId)
     if (!key) throw new Error("API key KIE AI untuk job ini tidak ditemukan")
-    const res = await fetch(`${BASE_URL}/api/v1/generate/record-info?taskId=${encodeURIComponent(jobId)}`, {
+    const path = options.market ? "/api/v1/jobs/recordInfo" : "/api/v1/generate/record-info"
+    const res = await fetch(`${BASE_URL}${path}?taskId=${encodeURIComponent(jobId)}`, {
       headers: { Authorization: `Bearer ${key}` },
     })
     const data = await res.json().catch(() => ({}))
     if (!res.ok || (data.code != null && Number(data.code) !== 200)) throw new Error(data.msg || data.message || `KIE AI ${res.status}`)
     const d = data.data || {}
-    const status = mapStatus(d.status)
+    const status = mapStatus(d.status || d.state)
     if (status === "success") return { status, ...parseTracks(data) }
-    if (status === "failed") return { status, error: d.errorMessage || data.msg || "KIE AI gagal generate" }
+    if (status === "failed") return { status, error: d.errorMessage || d.failMsg || data.msg || "KIE AI gagal generate" }
     return { status }
   },
   async checkCredits(key) {
