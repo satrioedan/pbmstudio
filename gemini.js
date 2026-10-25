@@ -34,27 +34,36 @@ function pickKey() {
   return pool[idx]
 }
 
-function buildPrompt({ theme, language, genre, mood, structure, extra }) {
+function buildPrompt({ theme, language, genre, mood, structure, extra, vocal, instrumental }) {
   const lang = (language || "Indonesia").trim()
   const parts = []
-  parts.push(`Tulis lirik lagu lengkap dalam bahasa ${lang}.`)
-  if (genre)  parts.push(`Genre: ${genre}.`)
-  if (mood)   parts.push(`Mood/Suasana: ${mood}.`)
-  if (structure) {
-    parts.push(`Struktur: ${structure}.`)
-  } else {
-    parts.push("Struktur standar: [Verse 1] [Pre-Chorus] [Chorus] [Verse 2] [Pre-Chorus] [Chorus] [Bridge] [Chorus] [Outro].")
-  }
+  parts.push(`Bahasa lirik: ${lang}.`)
+  if (genre) parts.push(`Genre: ${genre}.`)
+  if (mood) parts.push(`Mood/Suasana: ${mood}.`)
+  if (vocal && vocal !== "Bebas") parts.push(`Vokal: ${vocal}.`)
   parts.push(`Tema / pesan lagu: ${theme}`)
   if (extra) parts.push(`Instruksi tambahan: ${extra}`)
   parts.push("")
   parts.push("ATURAN KETAT:")
-  parts.push("- Output HANYA teks lirik mentah, siap di-copy ke generator musik (Suno/Lyria).")
-  parts.push("- Setiap bagian diawali tag dalam kurung siku: [Verse 1], [Chorus], [Bridge], dst. (HARUS bahasa Inggris).")
-  parts.push("- JANGAN tulis intro, kata pengantar, penjelasan, atau catatan apa pun. Mulai langsung dari [Verse 1].")
-  parts.push("- JANGAN bungkus dalam backtick atau markdown.")
-  parts.push("- Akhiri dengan baris terakhir [Outro] (jangan kosong).")
+  parts.push("- Jangan bungkus dalam backtick atau markdown.")
+  parts.push("- Baris pertama persis: TITLE: judul singkat, maksimal 80 karakter.")
+  parts.push("- Baris kedua persis: STYLE: tag gaya musik bahasa Inggris, dipisah koma, siap untuk Suno.")
+  if (instrumental) {
+    parts.push("- Ini instrumental. Jangan tulis lirik. Berhenti setelah baris STYLE.")
+    return parts.join("\n")
+  }
+  if (structure) parts.push(`Struktur: ${structure}.`)
+  else parts.push("Struktur standar: [Verse 1] [Pre-Chorus] [Chorus] [Verse 2] [Chorus] [Bridge] [Chorus] [Outro].")
+  parts.push("- Setelah STYLE, tulis lirik lengkap. Mulai langsung dari [Verse 1].")
+  parts.push("- Tag bagian harus bahasa Inggris: [Verse 1], [Chorus], [Bridge], dst.")
+  parts.push("- Jangan tulis pengantar atau catatan. Akhiri dengan [Outro].")
   return parts.join("\n")
+}
+function parseLyricPack(text) {
+  const raw = String(text || "").trim()
+  const title = ((raw.match(/^TITLE:\s*(.+)$/im) || [])[1] || "").replace(/^["']|["']$/g, "").trim().slice(0, 80)
+  const style = ((raw.match(/^STYLE:\s*(.+)$/im) || [])[1] || "").trim().slice(0, 300)
+  return { title, style, lyrics: cleanOutput(raw) }
 }
 
 function cleanOutput(text) {
@@ -173,7 +182,13 @@ export const gemini = {
   async generateLyrics(input) {
     if (MOCK) {
       await new Promise((r) => setTimeout(r, 600))
-      return { lyrics: mockLyrics(input), model: input.model || DEFAULT_MODEL, keyId: "mock" }
+      return {
+        lyrics: input.instrumental ? "" : mockLyrics(input),
+        title: String(input.theme || "Lagu Baru").slice(0, 48),
+        style: [input.genre, input.mood, input.language].filter(Boolean).join(", "),
+        model: input.model || DEFAULT_MODEL,
+        keyId: "mock",
+      }
     }
     const model = (input.model && GEMINI_MODELS.some((m) => m.id === input.model)) ? input.model : DEFAULT_MODEL
     const prompt = buildPrompt(input)
@@ -184,9 +199,9 @@ export const gemini = {
     for (let i = 0; i < totalKeys; i++) {
       const { id, key } = pickKey()
       try {
-        const lyrics = await callGemini(key, model, prompt)
+        const raw = await callGemini(key, model, prompt, { raw: true })
         store.updateGeminiKeyCredits(id, 1) // tandai valid
-        return { lyrics, model, keyId: id }
+        return { ...parseLyricPack(raw), model, keyId: id }
       } catch (e) {
         lastErr = e
         // 401/403/429 -> kemungkinan key bermasalah, tandai invalid lalu rotasi

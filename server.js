@@ -1649,11 +1649,13 @@ async function handleApi(req, res, url) {
       mood:      (body.mood      || "").toString().slice(0, 120),
       structure: (body.structure || "").toString().slice(0, 200),
       extra:     (body.extra     || "").toString().slice(0, 500),
+      vocal:     (body.vocal     || "").toString().slice(0, 40),
+      instrumental: body.instrumental === true || body.instrumental === "true",
       model:     (body.model     || "").toString().slice(0, 60),
     }
     try {
       const out = await gemini.generateLyrics(opts)
-      return sendJson(res, 200, { lyrics: out.lyrics, model: out.model, keyId: out.keyId })
+      return sendJson(res, 200, { lyrics: out.lyrics, title: out.title || "", style: out.style || "", model: out.model, keyId: out.keyId })
     } catch (e) {
       return sendJson(res, 502, { error: e.message })
     }

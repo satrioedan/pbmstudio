@@ -297,6 +297,7 @@ function initLyricsPage() {
       themeCount.textContent = themeInput.value.length
     })
   }
+  fillLyricCatalog()
   
   if (extraInput && extraCount) {
     extraInput.addEventListener('input', () => {
@@ -744,6 +745,7 @@ function setView(view) {
   if (isFp) renderBlocks() // Refresh blocks setiap lihat frontpage
   if (view === "library") loadSongs(false).catch(() => {})
   if (view === "liked") loadSongs(true).catch(() => {})
+  if (view === "lyrics") refreshLyricsKeyBanner().catch(() => {})
   if (view === "settings") { loadKeys().catch(() => {}); loadUploadKeys().catch(() => {}); loadGeminiKeys().catch(() => {}); loadKieKeys().catch(() => {}); loadMusicApiKeys().catch(() => {}); loadCrunKeys().then(refreshLiveCrunCredits).catch(() => {}) }
   if (view === "mastering") populateMasteringSongSelect()
 }
@@ -1738,30 +1740,129 @@ async function refreshLiveCrunCredits() {
 }
 
 // ------------------------------ Generate Lirik (Gemini) ---------------------
+const LYRIC_CATALOG = {
+  "Pop & Mainstream": ["Pop Indonesia", "Pop", "Soft Pop / Ballad", "Power Ballad", "Indie Pop", "Dance Pop", "Synth-Pop", "Bedroom Pop", "Tropical Pop"],
+  "Asia Pop": ["K-Pop", "J-Pop", "C-Pop", "City Pop", "Indo Pop"],
+  "Latin & Iberia": ["Latin Pop", "Reggaeton", "Bachata", "Salsa", "Bossa Nova"],
+  "Reggae & Karibia": ["Reggae", "Dancehall", "Ska", "Dub"],
+  "Hip-hop & Rap": ["Hip-hop", "Rap", "Trap", "Lo-fi Hip-hop"],
+  "R&B & Soul": ["R&B", "Soul", "Neo Soul", "Funk"],
+  "Jazz & Blues": ["Jazz", "Blues", "Smooth Jazz"],
+  "Country & Folk": ["Country", "Folk", "Acoustic"],
+  "Rock": ["Rock", "Alternative Rock", "Indie Rock", "Pop Rock"],
+  "Electronic / EDM": ["EDM", "House", "Techno", "Lo-fi Electronic"],
+  "Ambient & Cinematic": ["Ambient", "Cinematic", "Orchestral"],
+  "Religi & Devosi": ["Religi", "Nasyid", "Gospel"],
+  "Sunda & Priangan": ["Pop Sunda", "Pop Sunda Modern", "Kacapi Suling"],
+  "Dangdut & Koplo": ["Dangdut", "Dangdut Koplo", "Campursari", "Pop Jawa Koplo"],
+  "Tradisional Nusantara": ["Pop Melayu", "Pop Jawa", "Pop Minang", "Pop Batak", "Pop Bali", "Keroncong"],
+  "Anak & Seremonial": ["Lagu Anak", "Lullaby", "Lagu Sekolah"],
+}
+const LYRIC_MOODS = ["Romantis", "Cinta Pertama", "Rindu", "Patah Hati", "Sedih / Galau", "Bahagia / Ceria", "Semangat", "Nostalgia", "Tenang / Damai", "Religius / Khusyuk", "Misterius / Gelap", "Pernikahan", "Pulang Kampung"]
+function fillLyricCatalog() {
+  const cat = $("#l-category")
+  const genre = $("#l-genre")
+  const mood = $("#l-mood")
+  if (!cat || !genre || cat.dataset.ready) return
+  cat.innerHTML = Object.keys(LYRIC_CATALOG).map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("")
+  mood.innerHTML = LYRIC_MOODS.map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("")
+  const fillGenres = () => {
+    const list = LYRIC_CATALOG[cat.value] || []
+    genre.innerHTML = list.map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("")
+  }
+  cat.addEventListener("change", fillGenres)
+  fillGenres()
+  cat.dataset.ready = "1"
+}
+function setLyricState(mode) {
+  const empty = $("#l-empty")
+  const loading = $("#l-loading")
+  const result = $("#l-result-wrap")
+  if (empty) empty.hidden = mode !== "empty"
+  if (loading) loading.hidden = mode !== "loading"
+  if (result) result.hidden = mode !== "result"
+}
+function renderLyricLines(text) {
+  const view = $("#l-lyrics-view")
+  if (!view) return
+  view.replaceChildren()
+  const lines = String(text || "").split("\n")
+  if (!lines.some((line) => line.trim())) { view.hidden = true; return }
+  view.hidden = false
+  for (const line of lines) {
+    const p = document.createElement("p")
+    if (/^\s*\[[^\]]+\]\s*$/.test(line)) p.className = "kl-tag"
+    p.textContent = line || " "
+    view.appendChild(p)
+  }
+}
+async function refreshLyricsKeyBanner() {
+  const banner = $("#lyrics-key-banner")
+  if (!banner) return
+  try {
+    const d = await api("/api/gemini-keys")
+    banner.hidden = (d.count || 0) > 0
+  } catch { banner.hidden = true }
+}
+function resetLyricsStudio() {
+  const theme = $("#l-theme")
+  if (theme) theme.value = ""
+  const count = $("#l-theme-count")
+  if (count) count.textContent = "0"
+  const lang = $("#l-language")
+  if (lang) lang.value = "Indonesia"
+  const cat = $("#l-category")
+  if (cat) { cat.value = "Pop & Mainstream"; cat.dispatchEvent(new Event("change")) }
+  const mood = $("#l-mood")
+  if (mood) mood.value = "Romantis"
+  const vocal = $("#l-vocal")
+  if (vocal) vocal.value = "Bebas"
+  const instrumental = $("#l-instrumental")
+  if (instrumental) instrumental.checked = false
+  const msg = $("#lyrics-msg")
+  if (msg) msg.textContent = ""
+  setLyricState("empty")
+}
 function collectLyricsInput() {
+  const vocal = $("#l-vocal") ? $("#l-vocal").value : ""
+  const instrumental = $("#l-instrumental") ? $("#l-instrumental").checked : false
+  const extra = [
+    vocal && vocal !== "Bebas" ? `Vokal: ${vocal}` : "",
+    instrumental ? "Instrumental, tanpa lirik. Tetap buat judul dan style." : "",
+    $("#l-extra") ? $("#l-extra").value.trim() : "",
+  ].filter(Boolean).join(". ")
   return {
     theme:    $("#l-theme").value.trim(),
     language: $("#l-language").value,
     genre:    $("#l-genre").value.trim(),
     mood:     $("#l-mood").value.trim(),
-    extra:    $("#l-extra").value.trim(),
+    extra,
+    vocal,
+    instrumental,
     model:    $("#l-model").value,
   }
 }
 async function submitLyrics() {
   const btn = $("#btn-lyrics")
   const body = collectLyricsInput()
-  if (!body.theme) { toast("Tema lagu wajib diisi", "error"); return }
+  if (!body.theme) { toast("Ceritakan dulu keinginan lagunya", "error"); return }
   state.lastLyricsInput = body
   btn.disabled = true
-  $("#lyrics-msg").textContent = "\u2728 Gemini sedang menulis lirik\u2026"
+  $("#lyrics-msg").textContent = "Gemini sedang menulis judul, style, dan lirik…"
+  setLyricState("loading")
   try {
     const r = await api("/api/lyrics/generate", { method: "POST", body })
-    $("#l-result-wrap").style.display = ""
-    $("#l-result").value = r.lyrics
-    $("#lyrics-msg").textContent = "Lirik siap! Model: " + (r.model || "-")
+    const title = r.title || body.theme.slice(0, 48)
+    const style = r.style || [body.genre, body.mood, body.language].filter(Boolean).join(", ")
+    $("#l-title").textContent = title
+    $("#l-style").textContent = style
+    $("#l-result").value = r.lyrics || ""
+    renderLyricLines(r.lyrics)
+    setLyricState("result")
+    $("#lyrics-msg").textContent = "Siap. Model: " + (r.model || "-")
     toast("Lirik selesai dibuat", "success")
   } catch (e) {
+    setLyricState("empty")
     $("#lyrics-msg").textContent = e.message
     toast(e.message, "error")
   } finally { btn.disabled = false }
@@ -1777,13 +1878,28 @@ function fallbackCopyLyrics(v) {
   const ta = $("#l-result")
   ta.select(); document.execCommand("copy"); toast("Lirik disalin", "success")
 }
+function copyStyleText() {
+  const v = $("#l-style") ? $("#l-style").textContent.trim() : ""
+  if (!v) return
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(v).then(() => toast("Style disalin", "success"), () => toast("Style disalin", "success"))
+  }
+}
 function useLyricsInCreate() {
   const v = $("#l-result").value
-  if (!v) return
-  $("#f-lyrics").value = v
-  updateCreateCounts()
-  const inp = state.lastLyricsInput
-  if (inp && inp.genre && !$("#f-style").value.trim()) $("#f-style").value = inp.genre
+  const title = $("#l-title") ? $("#l-title").textContent.trim() : ""
+  const style = $("#l-style") ? $("#l-style").textContent.trim() : ""
+  if (!v && !title && !style) return
+  if ($("#f-lyrics")) $("#f-lyrics").value = v
+  if (title && title !== "—" && $("#f-title")) $("#f-title").value = title.slice(0, 80)
+  if (style && $("#f-style")) $("#f-style").value = style.slice(0, 1000)
+  const vocal = $("#l-vocal") ? $("#l-vocal").value : ""
+  const gender = $("#f-gender")
+  if (gender && (vocal === "Pria" || vocal === "Wanita")) {
+    const val = vocal === "Pria" ? "male" : "female"
+    gender.dataset.value = val
+    gender.querySelectorAll("[data-val]").forEach((b) => b.classList.toggle("active", b.dataset.val === val))
+  }
   updateCreateCounts()
   setView("create")
   toast("Lirik dimuat ke Buat lagu", "success")
@@ -1966,8 +2082,11 @@ function bindUIInner() {
   // Generate Lirik (Gemini)
   on("#btn-lyrics", "click", submitLyrics)
   on("#btn-l-copy", "click", copyLyrics)
+  on("#btn-l-copy-style", "click", copyStyleText)
   on("#btn-l-use", "click", useLyricsInCreate)
   on("#btn-l-regen", "click", submitLyrics)
+  on("#lyrics-reset", "click", resetLyricsStudio)
+  on("#lyrics-open-settings", "click", () => setView("settings"))
   // Frontpage editor
   $("#fp-ed-save")?.addEventListener("click", async () => {
     const btn = $("#fp-ed-save"); btn.disabled = true
