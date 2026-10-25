@@ -3178,6 +3178,7 @@ init().catch((e) => { console.error("Init failed:", e); toast && toast("Gagal me
     homofon: 'Aa  Homofon',
     liked: '♡  Disukai',
     lyrics: '✎  Buat Lirik',
+    presets: '☷  Persona & Preset',
     settings: '⚙  Pengaturan'
   };
 
