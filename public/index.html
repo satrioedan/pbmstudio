@@ -1,6 +1,6 @@
 <!DOCTYPE html> <html lang="id"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" /> <title>pbmstudio</title> <script>window.__BASE__="";</script> <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" /> <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" /> <link rel="apple-touch-icon" href="/icon-180.png" /> <link rel="manifest" href="/manifest.webmanifest" /> <meta name="theme-color" content="#0e0e12" /> <link rel="stylesheet" href="/styles.css?v=pbm-boost-20260902" /> <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js">
 </script> <link rel="stylesheet" href="/kampung-theme-boost.css?v=pbm-boost-20260902" /> <link rel="stylesheet" href="/pbm-ui-realcredits-20260903.css?v=pbm-realcredits-toast-20260903" />
-<link rel="stylesheet" href="/pbm-composer-final-20260906.css?v=2" /><link rel="stylesheet" href="/pbm-unified-final-20260906.css?v=1"><link rel="stylesheet" href="/pbm-landing-20260907.css?v=2"></head> <body> <!-- Topbar (mobile) --> <header class="topbar"> <div class="brand"> <img class="brand-logo" src="/icon-192.png" alt="" /> <div class="brand-text"> <div class="brand-name">pbmstudio</div> <div class="brand-sub">by Bangalimin</div> </div> </div> <div class="topbar-right"> <span class="credits-chip">
+<link rel="stylesheet" href="/pbm-composer-final-20260906.css?v=2" /><link rel="stylesheet" href="/pbm-unified-final-20260906.css?v=1"><link rel="stylesheet" href="/pbm-landing-20260907.css?v=2"><link rel="stylesheet" href="/lyrics-studio.css?v=2"></head> <body> <!-- Topbar (mobile) --> <header class="topbar"> <div class="brand"> <img class="brand-logo" src="/icon-192.png" alt="" /> <div class="brand-text"> <div class="brand-name">pbmstudio</div> <div class="brand-sub">by Bangalimin</div> </div> </div> <div class="topbar-right"> <span class="credits-chip">
 <span class="credits-label">APIframe</span>
 <strong id="credits-apiframe-m">—</strong>
 </span> <span class="credits-chip">
@@ -85,18 +85,112 @@
 </textarea> <div class="card-actions"> <button id="hf-copy" class="btn-secondary">📋 Salin</button> <button id="hf-download" class="btn-secondary">⬇️ Unduh .txt</button> </div> <div id="hf-status" class="mst-status">
 </div> </div> </div> <div class="settings-card"> <div class="card-body"> <h4>ℹ️ Apa itu homofon?</h4> <p class="card-desc">Homofon adalah dua kata (atau lebih) yang <b>bunyi/pelafalannya sama</b>, tapi <b>tulisan dan artinya berbeda</b>. Contoh Indonesia: "bank" (lembaga keuangan) &amp; "bang" (panggilan/tepi sungai); "masa" &amp; "massa". Contoh Inggris: "there" &amp; "their"; "flower" &amp; "flour". Alat ini mengganti kata yang cocok di teksmu dengan salah satu pasangan homofonnya sebagai referensi permainan kata atau latihan bahasa.</p> <h4 style="margin-top:12px">📖 Manual vs ✨ AI</h4> <p class="card-desc">
 <b>Manual</b> menggunakan kamus lokal yang cepat &amp; gratis. <b>AI</b> menggunakan Gemini untuk menghasilkan konversi yang lebih kreatif, kontekstual, dan menemukan homofon yang tidak ada di kamus — tapi memerlukan API key Gemini.</p> </div> </div> </div> </section> <!-- LIKED --> <section class="view liked-view" data-view="liked" id="view-liked"> <div class="liked-hero"> <!-- Header --> <div class="liked-header"> <div class="liked-title-section"> <h2>❤️ Lagu Favorit</h2> <p class="liked-subtitle">Koleksi lagu yang kamu suka</p> </div> <div class="liked-count"> <span class="count-value" id="liked-count">0</span> <span class="count-label">Lagu Disimpan</span> </div> </div> <!-- Song grid --> <div id="liked-list" class="track-list">
-</div> </div> </section> <!-- GENERATE LIRIK (Gemini) --> <section class="view lyrics-view" data-view="lyrics" id="view-lyrics"> <div class="lyrics-hero"> <!-- Header --> <div class="lyrics-header"> <h2>✍️ Generate Lirik</h2> <p class="lyrics-subtitle">Buat lirik lagu otomatis dengan AI. Hasilnya bisa langsung dipakai!</p> </div> <!-- Main theme input --> <div class="lyrics-main-input"> <div class="field-head"> <label>Tema Lagu <span class="req">*</span>
-</label> <span class="char-count">
-<span id="l-theme-count">0</span> / 500</span> </div> <textarea id="l-theme" rows="4" maxlength="500" placeholder="Ceritain tema lagunya... Contoh: rindu kampung halaman, perjuangan ibu tunggal, cinta pertama di SMA...">
-</textarea> </div> <!-- Quick mood/genre pills --> <div class="lyrics-quick-select"> <div class="quick-section"> <label class="quick-label">Genre Cepat:</label> <div class="quick-pills"> <button class="quick-pill" data-type="genre" data-value="Pop">Pop</button> <button class="quick-pill" data-type="genre" data-value="Rock">Rock</button> <button class="quick-pill" data-type="genre" data-value="Dangdut">Dangdut</button> <button class="quick-pill" data-type="genre" data-value="Ballad">Ballad</button> <button class="quick-pill" data-type="genre" data-value="Jazz">Jazz</button> </div> </div> <div class="quick-section"> <label class="quick-label">Mood Cepat:</label> <div class="quick-pills"> <button class="quick-pill" data-type="mood" data-value="Ceria">😊 Ceria</button> <button class="quick-pill" data-type="mood" data-value="Sedih">😢 Sedih</button> <button class="quick-pill" data-type="mood" data-value="Semangat">💪 Semangat</button> <button class="quick-pill" data-type="mood" data-value="Romantis">❤️ Romantis</button> <button class="quick-pill" data-type="mood" data-value="Melankolis">🌙 Melankolis</button> </div> </div> </div> <!-- Advanced options --> <div class="lyrics-advanced"> <button class="lyrics-advanced-toggle" type="button"> ⚙️ Opsi Lanjutan </button> <div class="lyrics-advanced-content"> <div class="lyrics-advanced-inner"> <!-- Language & Model --> <div class="lyrics-grid-2"> <div class="lyrics-field"> <label>Bahasa</label> <select id="l-language"> <option value="Indonesia" selected>Indonesia</option> <option value="Jawa">Jawa</option> <option value="Sunda">Sunda</option> <option value="Minang">Minang</option> <option value="Batak">Batak</option> <option value="Melayu">Melayu</option> <option value="English">English</option> <option value="Arabic">Arabic</option> <option value="Spanish">Spanish</option> </select> </div> <div class="lyrics-field"> <label>Model Gemini</label> <select id="l-model">
-</select> </div> </div> <!-- Genre & Mood --> <div class="lyrics-grid-2"> <div class="lyrics-field"> <label>Genre / Aliran <span class="muted">(opsional)</span>
-</label> <input id="l-genre" type="text" maxlength="120" placeholder="dangdut koplo, pop ballad, rock..."> </div> <div class="lyrics-field"> <label>Suasana / Mood <span class="muted">(opsional)</span>
-</label> <input id="l-mood" type="text" maxlength="120" placeholder="melankolis, ceria, semangat..."> </div> </div> <!-- Extra instructions --> <div class="lyrics-field"> <div class="field-head"> <label>Instruksi Tambahan <span class="muted">(opsional)</span>
-</label> <span class="char-count">
-<span id="l-extra-count">0</span> / 500</span> </div> <textarea id="l-extra" rows="3" maxlength="500" placeholder="Contoh: gunakan rima A-B-A-B, sebutkan nama kota, hindari kata tertentu...">
-</textarea> </div> </div> </div> </div> <!-- Generate button --> <button id="btn-lyrics" class="lyrics-generate-btn"> ✨ Buat Lirik Sekarang </button> <p id="lyrics-msg" class="msg">
-</p> </div> <!-- Result panel --> <div class="lyrics-result-panel" id="l-result-wrap" style="display:none"> <div class="result-header"> <h3>📝 Hasil Lirik</h3> <div class="result-actions-top"> <button id="btn-l-regen" class="btn-icon" title="Buat Ulang">🔁</button> </div> </div> <textarea id="l-result" rows="16" spellcheck="false" class="result-textarea">
-</textarea> <div class="result-actions"> <button id="btn-l-use" class="btn-primary-large">🎵 Pakai di Buat Lagu</button> <button id="btn-l-copy" class="btn-secondary-large">📋 Salin Lirik</button> </div> </div> </section> <!-- SETTINGS --> <section class="view settings-view" data-view="settings" id="view-settings"> <div class="settings-hero"> <!-- Header --> <div class="settings-header"> <h2>⚙️ Setelan</h2> <p class="settings-subtitle">Kelola API keys dan konfigurasi aplikasi</p> </div> <!-- API Keys Section --> <div class="settings-section"> <h3 class="section-title">🔑 API Keys</h3> <!-- APIframe --> <div class="settings-card"> <div class="card-header"> <div class="card-title"> <span class="card-icon">🎵</span> <div> <h4>APIframe</h4> <p class="card-subtitle">Suno / Lyria / Producer / Udio</p> </div> </div> </div> <div class="card-body"> <p class="card-desc">Bisa banyak kunci, satu per baris. Sistem akan rotasi otomatis bila satu kunci kena limit.</p> <textarea id="keys-input" rows="3" placeholder="apiframe_key_1&#10;apiframe_key_2" class="settings-textarea">
+</div> </div> </section> <!-- GENERATE LIRIK (Gemini) -->
+<section class="view lyrics-view" data-view="lyrics" id="view-lyrics">
+  <div class="kl-studio">
+    <div class="kl-card">
+      <div class="kl-head">
+        <h2>Bahan Lagu</h2>
+        <button type="button" class="kl-reset" id="lyrics-reset">Reset</button>
+      </div>
+      <div class="kl-banner" id="lyrics-key-banner" hidden>
+        Belum ada API key. Tambahkan di tab
+        <button type="button" id="lyrics-open-settings">Setelan</button>
+        sebelum membuat lirik.
+      </div>
+      <div class="kl-field">
+        <label class="kl-label" for="l-theme">Ceritakan keinginanmu <span class="kl-count"><span id="l-theme-count">0</span>/240</span></label>
+        <textarea id="l-theme" rows="4" maxlength="240" placeholder="Tulis isi pikiran atau keinginanmu secara bebas. AI akan merangkai judul dan lirik dari ceritamu."></textarea>
+      </div>
+      <div class="kl-field">
+        <label class="kl-label" for="l-language">Bahasa lirik</label>
+        <select id="l-language">
+          <option value="Indonesia" selected>Indonesian — Bahasa Indonesia</option>
+          <option value="English">English</option>
+          <option value="Jawa">Jawa — Basa Jawa</option>
+          <option value="Sunda">Sunda — Basa Sunda</option>
+          <option value="Minang">Minang</option>
+          <option value="Batak">Batak</option>
+          <option value="Melayu">Melayu</option>
+          <option value="Arabic">Arabic</option>
+          <option value="Spanish">Spanish</option>
+          <option value="Japanese">Japanese</option>
+          <option value="Korean">Korean</option>
+        </select>
+      </div>
+      <div class="kl-pair">
+        <div class="kl-field">
+          <label class="kl-label" for="l-category">Kategori</label>
+          <select id="l-category"></select>
+        </div>
+        <div class="kl-field">
+          <label class="kl-label" for="l-genre">Genre</label>
+          <select id="l-genre"></select>
+        </div>
+      </div>
+      <div class="kl-pair">
+        <div class="kl-field">
+          <label class="kl-label" for="l-mood">Mood</label>
+          <select id="l-mood"></select>
+        </div>
+        <div class="kl-field">
+          <label class="kl-label" for="l-vocal">Vokal</label>
+          <select id="l-vocal">
+            <option value="Bebas" selected>Bebas</option>
+            <option value="Pria">Pria</option>
+            <option value="Wanita">Wanita</option>
+            <option value="Duet">Duet</option>
+          </select>
+        </div>
+      </div>
+      <label class="kl-check">
+        <input id="l-instrumental" type="checkbox" />
+        <span>Instrumental (tanpa lirik) — tetap dapat judul dan style musik.</span>
+      </label>
+      <label class="kl-model">Model
+        <select id="l-model" aria-label="Model Gemini"></select>
+      </label>
+      <button id="btn-lyrics" class="kl-go" type="button">Buat Lirik</button>
+      <p id="lyrics-msg" class="kl-msg" role="status"></p>
+    </div>
+    <section class="kl-result" aria-label="Hasil lirik dan style">
+      <div class="kl-result-head">
+        <div>
+          <h2>Hasil Lirik dan Style</h2>
+          <p>Mohon diperiksa kembali — hasil AI kadang masih memberikan kesalahan.</p>
+        </div>
+      </div>
+      <div class="kl-sheet">
+        <div class="kl-empty" id="l-empty">
+          <div class="kl-note-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18V6.2l10-2V16"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></svg>
+          </div>
+          <h3>Hasil akan muncul di sini</h3>
+          <p>Isi ide, pilih bahasa, genre, dan mood, lalu tekan tombol Buat Lirik.</p>
+        </div>
+        <div class="kl-loading" id="l-loading" hidden>
+          <h3>Sedang menulis</h3>
+          <p>Gemini merangkai judul, style, dan lirik.</p>
+        </div>
+        <div class="kl-output" id="l-result-wrap" hidden>
+          <p class="kl-kicker">Judul</p>
+          <h3 class="kl-title" id="l-title">—</h3>
+          <p class="kl-kicker" style="margin-top:16px">Style</p>
+          <p class="kl-style" id="l-style"></p>
+          <div class="kl-lyrics" id="l-lyrics-view"></div>
+          <textarea id="l-result" hidden readonly></textarea>
+          <div class="kl-actions">
+            <button id="btn-l-use" class="kl-primary" type="button">Pakai di Buat Lagu</button>
+            <button id="btn-l-copy" type="button">Salin lirik</button>
+            <button id="btn-l-copy-style" type="button">Salin style</button>
+            <button id="btn-l-regen" type="button">Buat ulang</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+<!-- SETTINGS --> <section class="view settings-view" data-view="settings" id="view-settings"> <div class="settings-hero"> <!-- Header --> <div class="settings-header"> <h2>⚙️ Setelan</h2> <p class="settings-subtitle">Kelola API keys dan konfigurasi aplikasi</p> </div> <!-- API Keys Section --> <div class="settings-section"> <h3 class="section-title">🔑 API Keys</h3> <!-- APIframe --> <div class="settings-card"> <div class="card-header"> <div class="card-title"> <span class="card-icon">🎵</span> <div> <h4>APIframe</h4> <p class="card-subtitle">Suno / Lyria / Producer / Udio</p> </div> </div> </div> <div class="card-body"> <p class="card-desc">Bisa banyak kunci, satu per baris. Sistem akan rotasi otomatis bila satu kunci kena limit.</p> <textarea id="keys-input" rows="3" placeholder="apiframe_key_1&#10;apiframe_key_2" class="settings-textarea">
 </textarea> <div class="card-actions"> <button id="keys-add" class="btn-action">➕ Tambah</button> <button id="keys-check" class="btn-action secondary">🔍 Cek Kredit</button> </div> <div class="key-summary muted" id="keys-summary">
 </div> <ul class="key-list" id="keys-list">
 </ul> </div> </div> <!-- sunoapi.org --> <div class="settings-card"> <div class="card-header"> <div class="card-title"> <span class="card-icon">📤</span> <div> <h4>sunoapi.org</h4> <p class="card-subtitle">Upload & Cover, Stem, WAV</p> </div> </div> </div> <div class="card-body"> <p class="card-desc">Bisa banyak kunci juga. <a href="https://sunoapi.org/api-key" target="_blank" rel="noopener">Dapatkan kunci →</a>
@@ -162,7 +256,7 @@
 </p> <div class="actions"> <button id="stem-go" class="btn-primary">🎼 Pisah stem (11 kredit)</button> <button id="wav-go" class="btn-secondary">💽 Konversi ke WAV (6 kredit)</button> <button id="stem-cancel" class="btn-text">Batal</button> </div> <p class="muted small" id="stem-status">
 </p> </div> </div> <!-- Mini player bar --> <div id="mini-player" class="mini-player hidden"> <img id="mp-cover" class="mp-cover" src="/icon-192.png" alt="" /> <div class="mp-info"> <div class="mp-title" id="mp-title">—</div> <div class="mp-sub" id="mp-sub">—</div> </div> <div class="mp-controls"> <button id="mp-prev" class="mp-btn" title="Sebelumnya">⏮️</button> <button id="mp-play" class="mp-btn mp-play-btn" title="Play/Pause">▶️</button> <button id="mp-next" class="mp-btn" title="Berikutnya">⏭️</button> <button id="mp-close" class="mp-btn mp-close-btn" title="Tutup">✕</button> </div> <div class="mp-progress"> <div class="mp-progress-bar" id="mp-progress-bar">
 </div> </div> </div> <div id="toast" class="toast hidden">
-</div> <script src="/app.presets-20260910.js?v=add-vocals">
+</div> <script src="/app.presets-20260910.js?v=lyrics-studio">
 </script> <script src="/kampung-ui.js?v=pbm-boost-20260902">
 </script>
 <script src="/pbm-composer-navigation-20260906.js?v=1"></script><script src="/pbm-unified-20260906.js?v=1"></script><script src="/pbm-landing-20260907.js?v=2"></script><script src="/pbm-presets-20260910.js?v=1"></script></body> </html>
