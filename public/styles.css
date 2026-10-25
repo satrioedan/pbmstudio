@@ -2054,6 +2054,146 @@ audio { width: 100%; margin-top: 10px; border-radius: var(--radius-sm); }
 
 
 
+/* ========================= SETTINGS PAGE (KAMPUNG LIRIK STYLE) ========================= */
+.settings-view {
+  --settings-ink: #252522;
+  --settings-muted: #77756f;
+  --settings-paper: #fffefa;
+  --settings-wash: #f6f5f1;
+  --settings-line: #e5e2d9;
+  --settings-gold: #b88a2d;
+  --settings-gold-soft: #f5ead1;
+  max-width: 1120px;
+  min-height: calc(100vh - 64px);
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  color: var(--settings-ink);
+}
+
+.settings-view .settings-hero {
+  gap: 28px;
+}
+
+.settings-view .settings-header {
+  max-width: 760px;
+  margin: 0 auto 4px;
+  text-align: center;
+}
+
+.settings-view .settings-header h2 {
+  margin-bottom: 10px;
+  color: var(--settings-ink);
+  font-size: clamp(26px, 4vw, 36px);
+  letter-spacing: -0.04em;
+}
+
+.settings-view .settings-subtitle,
+.settings-view .card-desc,
+.settings-view .card-subtitle,
+.settings-view .muted {
+  color: var(--settings-muted);
+}
+
+.settings-view .settings-section {
+  gap: 14px;
+}
+
+.settings-view .section-title {
+  margin: 0 0 4px;
+  color: var(--settings-ink);
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+
+.settings-view .settings-section:first-of-type {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.settings-view .settings-section:first-of-type > .section-title {
+  grid-column: 1 / -1;
+}
+
+.settings-view .settings-card {
+  background: var(--settings-paper);
+  border: 1px solid var(--settings-line);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(55, 49, 35, 0.04);
+}
+
+.settings-view .settings-card:hover {
+  border-color: #d6b66f;
+  box-shadow: 0 12px 28px rgba(55, 49, 35, 0.08);
+}
+
+.settings-view .card-header {
+  padding: 17px 18px;
+  background: var(--settings-wash);
+  border-bottom: 1px solid var(--settings-line);
+}
+
+.settings-view .card-body {
+  gap: 13px;
+  padding: 18px;
+}
+
+.settings-view .card-icon {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #eadfc7;
+  border-radius: 11px;
+  background: var(--settings-gold-soft);
+  filter: grayscale(1);
+}
+
+.settings-view .card-title h4 {
+  color: var(--settings-ink);
+  font-size: 15px;
+}
+
+.settings-view .settings-textarea,
+.settings-view .settings-input {
+  box-sizing: border-box;
+  border: 1px solid var(--settings-line);
+  border-radius: 12px;
+  background: #fbfaf7;
+  color: var(--settings-ink);
+  box-shadow: inset 0 1px 2px rgba(55, 49, 35, 0.025);
+}
+
+.settings-view .settings-textarea:focus,
+.settings-view .settings-input:focus {
+  border-color: var(--settings-gold);
+  box-shadow: 0 0 0 3px rgba(184, 138, 45, 0.14);
+}
+
+.settings-view .btn-action,
+.settings-view .theme-toggle-btn {
+  border: 1px solid #d4b675;
+  border-radius: 999px;
+  background: var(--settings-gold-soft);
+  color: #76551a;
+  font-weight: 700;
+}
+
+.settings-view .btn-action.secondary {
+  border-color: var(--settings-line);
+  background: transparent;
+  color: var(--settings-muted);
+}
+
+.settings-view .theme-toggle-wrapper {
+  display: flex;
+  justify-content: flex-start;
+}
+
+@media (max-width: 720px) {
+  .settings-view { padding: 24px 14px 36px; }
+  .settings-view .settings-section:first-of-type { display: flex; }
+  .settings-view .settings-header h2 { font-size: 28px; }
+}
+
 /* ========================= SETTINGS PAGE (MODERN STYLE) ========================= */
 .settings-view {
   max-width: 1000px;
@@ -2318,6 +2458,41 @@ audio { width: 100%; margin-top: 10px; border-radius: var(--radius-sm); }
 .theme-icon {
   font-size: 24px;
 }
+
+.theme-text {
+  font-size: 15px;
+}
+
+/* Kampung Lirik visual language wins over the legacy settings theme. */
+.settings-view {
+  max-width: 1120px;
+  min-height: calc(100vh - 64px);
+  padding: 32px 24px 48px;
+  color: #252522;
+}
+.settings-view .settings-header h2,
+.settings-view .section-title,
+.settings-view .card-title h4 { color: #252522; }
+.settings-view .settings-subtitle,
+.settings-view .card-desc,
+.settings-view .card-subtitle,
+.settings-view .muted { color: #77756f; }
+.settings-view .settings-card {
+  background: #fffefa;
+  border: 1px solid #e5e2d9;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(55, 49, 35, 0.04);
+}
+.settings-view .settings-card:hover { border-color: #d6b66f; box-shadow: 0 12px 28px rgba(55, 49, 35, 0.08); }
+.settings-view .card-header { background: #f6f5f1; border-bottom-color: #e5e2d9; }
+.settings-view .settings-textarea,
+.settings-view .settings-input { background: #fbfaf7; border-color: #e5e2d9; color: #252522; }
+.settings-view .settings-textarea:focus,
+.settings-view .settings-input:focus { border-color: #b88a2d; box-shadow: 0 0 0 3px rgba(184, 138, 45, 0.14); }
+.settings-view .btn-action,
+.settings-view .theme-toggle-btn { background: #f5ead1; border-color: #d4b675; color: #76551a; }
+.settings-view .btn-action.secondary { background: transparent; border-color: #e5e2d9; color: #77756f; }
+@media (max-width: 720px) { .settings-view { padding: 24px 14px 36px; } }
 
 .theme-text {
   font-size: 15px;
